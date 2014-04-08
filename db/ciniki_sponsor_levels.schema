@@ -1,0 +1,42 @@
+#
+# Description
+# -----------
+# This table stores the sponsorship levels for the sponsors.
+#
+# Fields
+# ------
+# id:				The ID assigned to the sponsorship level.
+# uuid:				The Universal Unique ID.
+# business_id:		The business the sponsorship level is attached to.
+#
+# name:				The name for the sponsorship level.
+# permalink:		The permalink for the sponsor.
+#
+# sequence:			The display order for sponsors.
+#
+# size:				The size of the logos being displayed on the website.  
+#					The possible levels currently are:
+#
+#					50 - Largest
+#					40 -
+#					30 -
+#					20 - 
+#					10 - Smallest
+#
+# date_added:		The UTC date and time the record was added.
+# last_updated:		The UTC date and time the record was last updated.
+#
+create table ciniki_sponsor_levels (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
+	name varchar(150) not null,
+	permalink varchar(150) not null,
+	sequence tinyint unsigned not null,
+	size tinyint unsigned not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (id),
+	unique index (uuid),
+	index sync (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';
