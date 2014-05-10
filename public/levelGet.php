@@ -58,7 +58,7 @@ function ciniki_sponsors_levelGet($ciniki) {
 		return $rc;
 	}
 	if( !isset($rc['levels']) || !isset($rc['levels'][0]) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1687', 'msg'=>'Unable to find sponsorship level.'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1696', 'msg'=>'Unable to find sponsorship level.'));
 	}
 	$level = $rc['levels'][0]['level'];
 	

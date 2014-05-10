@@ -52,7 +52,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
 		return $rc;
 	}
 	if isset($rc['num']['sponsors']) && $rc['num']['sponsors'] > 0 ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1692', 'msg'=>'All sponsors must be removed from the sponsorship level before it can be removed.'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1699', 'msg'=>'All sponsors must be removed from the sponsorship level before it can be removed.'));
 	}
 
 	//
@@ -68,7 +68,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
 		return $rc;
 	}
 	if( !isset($rc['level']) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1627', 'msg'=>'The sponsorship level does not exist.'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1697', 'msg'=>'The sponsorship level does not exist.'));
 	}
 	$level_uuid = $rc['level']['uuid'];
 
