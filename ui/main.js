@@ -94,7 +94,7 @@ function ciniki_sponsors_main() {
 		//
 		this.sedit = new M.panel('Sponsor',
 			'ciniki_sponsors_main', 'sedit',
-			'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.sedit');
+			'mc', 'medium mediumaside', 'sectioned', 'ciniki.sponsors.main.sedit');
 		this.sedit.data = null;
 		this.sedit.level_id = 0;
 		this.sedit.sponsor_id = 0;
@@ -102,7 +102,7 @@ function ciniki_sponsors_main() {
 			'_image':{'label':'', 'aside':'yes', 'fields':{
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
-            'general':{'label':'General', 'fields':{
+            'general':{'label':'General', 'aside':'yes', 'fields':{
                 'title':{'label':'Name', 'hint':'Events name', 'type':'text'},
 				'level_id':{'label':'Level', 'active':'no', 'type':'select', 'options':{}},
                 'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
