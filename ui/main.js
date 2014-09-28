@@ -46,7 +46,7 @@ function ciniki_sponsors_main() {
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
             'general':{'label':'', 'fields':{
-                'name':{'label':'Name', 'hint':'Events name', 'type':'text'},
+                'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
                 'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
                 'size':{'label':'Size', 'type':'toggle', 'toggles':this.sizeOptions},
                 }}, 
@@ -103,7 +103,7 @@ function ciniki_sponsors_main() {
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
             'general':{'label':'General', 'aside':'yes', 'fields':{
-                'title':{'label':'Name', 'hint':'Events name', 'type':'text'},
+                'title':{'label':'Name', 'hint':'Sponsor name', 'type':'text'},
 				'level_id':{'label':'Level', 'active':'no', 'type':'select', 'options':{}},
                 'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
 				'webflags':{'label':'Website', 'type':'flags', 'toggle':'no', 'join':'yes', 'flags':this.webFlags},

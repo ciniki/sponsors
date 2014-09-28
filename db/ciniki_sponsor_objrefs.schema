@@ -1,0 +1,42 @@
+#
+# Description
+# -----------
+# This table store the connections of sponsors to objects in other modules.
+# This allows sponsors to be attached to events, web pages, etc.
+#
+# Fields
+# ------
+# id:				The ID assigned to the sponsorship level.
+# uuid:				The Universal Unique ID.
+# business_id:		The business the sponsorship level is attached to.
+#
+# sponsor_id:		The ID of the sponsor attached to the object.
+# object:			The object the sponsor is attached to.  This is a reference
+# 					to the package.module.object.  When combined with the object_id
+#					the refering module can lookup sponsors.
+# object_id:		The ID of the object the sponsor is attached to.
+#
+# sequence:			The display order for sponsor.
+#
+# webflags:			The display flags for the website with this object.
+#
+#					0x01 - Hidden, do not show online with this object.
+#
+# date_added:		The UTC date and time the record was added.
+# last_updated:		The UTC date and time the record was last updated.
+#
+create table ciniki_sponsor_objrefs (
+	id int not null auto_increment,
+	uuid char(36) not null,
+	business_id int not null,
+	sponsor_id int not null,
+	object varchar(100) not null,
+	object_id varchar(100) not null,
+	sequence tinyint unsigned not null,
+	webflags tinyint unsigned not null,
+	date_added datetime not null,
+	last_updated datetime not null,
+	primary key (id),
+	unique index (sponsor_id, object, object_id),
+	index sync (business_id, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';

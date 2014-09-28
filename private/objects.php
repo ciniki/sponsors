@@ -42,6 +42,18 @@ function ciniki_sponsors_objects($ciniki) {
 			),
 		'history_table'=>'ciniki_sponsor_history',
 		);
+	$objects['objref'] = array(
+		'name'=>'Object Reference',
+		'sync'=>'yes',
+		'table'=>'ciniki_sponsor_objrefs',
+		'fields'=>array(
+			'sponsor_id'=>array(),
+			'object'=>array(),
+			'object_id'=>array(),
+			'sequence'=>array(),
+			),
+		'history_table'=>'ciniki_sponsor_history',
+		);
 	
 	return array('stat'=>'ok', 'objects'=>$objects);
 }
