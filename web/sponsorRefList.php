@@ -27,6 +27,8 @@ function ciniki_sponsors_web_sponsorRefList($ciniki, $settings, $business_id, $o
 			. "AND ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
 			. ") "
 		. "WHERE ciniki_sponsor_objrefs.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+		. "AND ciniki_sponsor_objrefs.object = '" . ciniki_core_dbQuote($ciniki, $object) . "' "
+		. "AND ciniki_sponsor_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $object_id) . "' "
 		// Check the participant is visible on the website
 		. "AND (ciniki_sponsor_objrefs.webflags&0x01) = 0 "
 		. "ORDER BY ciniki_sponsor_objrefs.sequence DESC, title ";
