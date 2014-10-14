@@ -27,6 +27,7 @@ function ciniki_sponsors_hooks_sponsorList($ciniki, $business_id, $args) {
 			. "AND ciniki_sponsor_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
 			. "ORDER BY ciniki_sponsor_objrefs.sequence, ciniki_sponsors.title "
 			. "";
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 		$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
 			array('container'=>'sponsors', 'fname'=>'id', 'name'=>'sponsor',
 				'fields'=>array('ref_id', 'sponsor_id'=>'id', 'title')),
