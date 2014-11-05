@@ -58,7 +58,7 @@ function ciniki_sponsors_refDetailGet($ciniki) {
 			. "AND ciniki_sponsor_objrefdetails.object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
 			. "";
 	} else {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2056', 'msg'=>'Unable to get details'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2063', 'msg'=>'Unable to get details'));
 	}
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
@@ -71,7 +71,7 @@ function ciniki_sponsors_refDetailGet($ciniki) {
 	}
 	if( !isset($rc['details']) || !isset($rc['details'][0]) ) {
 		if( isset($args['detail_id']) && $args['detail_id'] != '' ) {
-			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2056', 'msg'=>'Unable to find details'));
+			return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2064', 'msg'=>'Unable to find details'));
 		} 
 		$detail = array(
 			'id'=>0,

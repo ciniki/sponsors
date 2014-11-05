@@ -69,7 +69,7 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
 		return $rc;
 	}
 	if( isset($rc['num']['refs']) && $rc['num']['refs'] > 0 ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2048', 'msg'=>'All references to this sponsor must be removed before the sponsor can be deleted.'));
+		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2056', 'msg'=>'All references to this sponsor must be removed before the sponsor can be deleted.'));
 	}
 
 	//
