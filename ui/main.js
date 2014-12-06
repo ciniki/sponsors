@@ -15,6 +15,10 @@ function ciniki_sponsors_main() {
 			'ciniki_sponsors_main', 'levels',
 			'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.levels');
 		this.levels.sections = {
+			'search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':2,
+				'hint':'Search sponsors', 'noData':'No sponsors found',
+				'headerValues':['Sponsors', 'Level'],
+				},
 			'levels':{'label':'Sponsorship Levels', 'type':'simplegrid', 'num_cols':1,
 				'headerValues':null,
 				'cellClasses':[''],
@@ -23,6 +27,27 @@ function ciniki_sponsors_main() {
 				'addFn':'M.ciniki_sponsors_main.showLevelEdit(\'M.ciniki_sponsors_main.showLevels();\',0);',
 				},
 			};
+		this.levels.liveSearchCb = function(s, i, value) {
+			if( s == 'search' && value != '' ) {
+				M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':'10'}, 
+					function(rsp) { 
+						M.ciniki_sponsors_main.levels.liveSearchShow('search', null, M.gE(M.ciniki_sponsors_main.levels.panelUID + '_' + s), rsp.sponsors); 
+					});
+				return true;
+			}
+		};
+		this.levels.liveSearchResultValue = function(s, f, i, j, d) {
+			if( s == 'search' ) { 
+				switch(j) {
+					case 0: return d.sponsor.title;
+					case 1: return (d.sponsor.level_name!=null?d.sponsor.level_name:'No sponsorship level');
+				}
+			}
+			return '';
+		};
+		this.levels.liveSearchResultRowFn = function(s, f, i, j, d) { 
+			return 'M.ciniki_sponsors_main.showSponsorEdit(\'M.ciniki_sponsors_main.showLevels();\',\'' + d.sponsor.id + '\');'; 
+		};
 		this.levels.sectionData = function(s) { return this.data[s]; }
 		this.levels.noData = function(s) { return this.sections[s].noData; }
 		this.levels.cellValue = function(s, i, j, d) {

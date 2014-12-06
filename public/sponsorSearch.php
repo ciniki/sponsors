@@ -40,11 +40,16 @@ function ciniki_sponsors_sponsorSearch($ciniki) {
 	//
 	// Load the sponsors
 	//
-	$strsql = "SELECT id, title  "
+	$strsql = "SELECT ciniki_sponsors.id, ciniki_sponsors.title, "
+		. "ciniki_sponsor_levels.name "
 		. "FROM ciniki_sponsors "
-		. "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-		. "AND (title LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
-			. "OR title LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+		. "LEFT JOIN ciniki_sponsor_levels ON ("
+			. "ciniki_sponsors.level_id = ciniki_sponsor_levels.id "
+			. "AND ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+			. ") "
+		. "WHERE ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+		. "AND (ciniki_sponsors.title LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
+			. "OR ciniki_sponsors.title LIKE '% " . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
 			. ") "
 		. "";
 	$strsql	.= "ORDER BY ciniki_sponsors.title "
@@ -52,7 +57,7 @@ function ciniki_sponsors_sponsorSearch($ciniki) {
 	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
 	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
 		array('container'=>'sponsors', 'fname'=>'id', 'name'=>'sponsor',
-			'fields'=>array('id', 'title')),
+			'fields'=>array('id', 'title', 'level_name'=>'name')),
 		));
 	if( $rc['stat'] != 'ok' ) {
 		return $rc;

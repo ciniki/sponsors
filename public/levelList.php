@@ -79,7 +79,7 @@ function ciniki_sponsors_levelList($ciniki) {
 	}
 	if( isset($rc['num']['sponsors']) && $rc['num']['sponsors'] > 0 ) {
 		$levels[] = array('level'=>array('id'=>'0', 
-			'name'=>'No Sponsorship Level', 
+			'name'=>'No sponsorship level', 
 			'sequence'=>'0', 
 			'num_sponsors'=>$rc['num']['sponsors']
 			));
