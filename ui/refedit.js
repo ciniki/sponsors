@@ -84,9 +84,12 @@ function ciniki_sponsors_refedit() {
 		};
 		this.edit.fieldValue = function(s, i, d) { return this.data[i]; }
 		this.edit.fieldHistoryArgs = function(s, i) {
-			if( i == 'ref_sequence' || i == 'ref_webflags' ) {
+			if( i == 'ref_sequence' ) {
 				return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
-					'ref_id':this.ref_id, 'field':i}};
+					'ref_id':this.ref_id, 'field':'sequence'}};
+			} else if( i == 'ref_webflags' ) {
+				return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
+					'ref_id':this.ref_id, 'field':'webflags'}};
 			} else {
 				return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'business_id':M.curBusinessID, 
 					'sponsor_id':this.sponsor_id, 'field':i}};
