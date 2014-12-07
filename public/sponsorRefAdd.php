@@ -93,6 +93,17 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
 		}
 	}
 
+	if( isset($args['ref_sequence']) ) {
+		$args['sequence'] = $args['ref_sequence'];
+	} elseif( isset($args['sequence']) ) {
+		unset($args['sequence']);
+	}
+	if( isset($args['ref_webflags']) ) {
+		$args['webflags'] = $args['ref_webflags'];
+	} elseif( isset($args['webflags']) ) {
+		unset($args['webflags']);
+	}
+
 	//
 	// Add the ref to the database
 	//
