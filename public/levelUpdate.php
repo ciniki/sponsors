@@ -46,6 +46,7 @@ function ciniki_sponsors_levelUpdate(&$ciniki) {
     }   
 
 	if( isset($args['name']) ) {
+		ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'makePermalink');
 		$args['permalink'] = ciniki_core_makePermalink($ciniki, $args['name']);
 
 		//
