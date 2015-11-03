@@ -66,7 +66,7 @@ function ciniki_sponsors_ref() {
 		this.edit.object_id = '';
 		this.edit.sponsor_id = 0;
 		this.edit.sections = {
-			'_image':{'label':'', 'fields':{
+			'_image':{'label':'', 'type':'imageform', 'fields':{
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
             'general':{'label':'General', 'fields':{

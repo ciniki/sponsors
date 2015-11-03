@@ -67,7 +67,7 @@ function ciniki_sponsors_main() {
 		this.ledit.data = null;
 		this.ledit.sponsor_id = 0;
 		this.ledit.sections = {
-			'_image':{'label':'', 'aside':'yes', 'fields':{
+			'_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
             'general':{'label':'', 'fields':{
@@ -124,7 +124,7 @@ function ciniki_sponsors_main() {
 		this.sedit.level_id = 0;
 		this.sedit.sponsor_id = 0;
 		this.sedit.sections = {
-			'_image':{'label':'', 'aside':'yes', 'fields':{
+			'_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
 				'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
 			}},
             'general':{'label':'General', 'aside':'yes', 'fields':{
