@@ -75,7 +75,7 @@ function ciniki_sponsors_main() {
                 'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
                 'size':{'label':'Size', 'type':'toggle', 'toggles':this.sizeOptions},
                 }}, 
-			'_save':{'label':'', 'buttons':{
+			'_buttons':{'label':'', 'buttons':{
 				'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.saveLevel();'},
 				'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.removeLevel();'},
 				}},
@@ -140,7 +140,7 @@ function ciniki_sponsors_main() {
 			'_notes':{'label':'Notes', 'fields':{
 				'notes':{'label':'', 'hidelabel':'yes', 'hint':'', 'type':'textarea'},
 				}},
-			'_save':{'label':'', 'buttons':{
+			'_buttons':{'label':'', 'buttons':{
 				'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.saveSponsor();'},
 				'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.removeSponsor();'},
 				}},
@@ -299,6 +299,7 @@ function ciniki_sponsors_main() {
 		this.sedit.reset();
 		if( sid != null ) { this.sedit.sponsor_id = sid; }
 		if( this.sedit.sponsor_id > 0 ) {
+            this.sedit.sections._buttons.buttons.delete.visible = 'yes';
 			M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'business_id':M.curBusinessID, 
 				'sponsor_id':this.sedit.sponsor_id}, function(rsp) {
 					if( rsp.stat != 'ok' ) {
@@ -320,6 +321,7 @@ function ciniki_sponsors_main() {
 					p.show(cb);
 				});
 		} else {
+            this.sedit.sections._buttons.buttons.delete.visible = 'no';
 			this.sedit.data = {};
 			if( lid != null && lid != 0 ) {
 				this.sedit.data.level_id = lid;
