@@ -8,12 +8,12 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:		The ID of the business the sponsor is attached to.
-// name:			(optional) The new name of the sponsor.
-// url:				(optional) The new URL for the sponsor website.
-// description:		(optional) The new description for the sponsor.
-// start_date:		(optional) The new date the sponsor starts.  
-// end_date:		(optional) The new date the sponsor ends, if it's longer than one day.
+// business_id:     The ID of the business the sponsor is attached to.
+// name:            (optional) The new name of the sponsor.
+// url:             (optional) The new URL for the sponsor website.
+// description:     (optional) The new description for the sponsor.
+// start_date:      (optional) The new date the sponsor starts.  
+// end_date:        (optional) The new date the sponsor ends, if it's longer than one day.
 // 
 // Returns
 // -------
@@ -27,11 +27,11 @@ function ciniki_sponsors_refDetailUpdate(&$ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
         'detail_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Reference'), 
-		'object'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object'), 
-		'object_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object ID'), 
-		'title'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Title'), 
-		'content'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Content'), 
-		'size'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'20', 'name'=>'Size'), 
+        'object'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object'), 
+        'object_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object ID'), 
+        'title'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Title'), 
+        'content'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Content'), 
+        'size'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'20', 'name'=>'Size'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -48,15 +48,15 @@ function ciniki_sponsors_refDetailUpdate(&$ciniki) {
         return $rc;
     }   
 
-	//
-	// Update the sponsor in the database
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-	$rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.sponsors.objrefdetail', $args['detail_id'], $args, 0x07);
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
+    //
+    // Update the sponsor in the database
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
+    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.sponsors.objrefdetail', $args['detail_id'], $args, 0x07);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
 
-	return array('stat'=>'ok');
+    return array('stat'=>'ok');
 }
 ?>

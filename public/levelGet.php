@@ -8,8 +8,8 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:		The ID of the business the sponsor is attached to.
-// level_id:		The ID of the sponsor to get the details for.
+// business_id:     The ID of the business the sponsor is attached to.
+// level_id:        The ID of the sponsor to get the details for.
 // 
 // Returns
 // -------
@@ -38,30 +38,30 @@ function ciniki_sponsors_levelGet($ciniki) {
         return $rc;
     }   
 
-	$strsql = "SELECT ciniki_sponsor_levels.id, "
-		. "ciniki_sponsor_levels.name, "
-		. "ciniki_sponsor_levels.permalink, "
-		. "ciniki_sponsor_levels.sequence, "
-		. "ciniki_sponsor_levels.size "
-		. "FROM ciniki_sponsor_levels "
-		. "WHERE ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
-		. "AND ciniki_sponsor_levels.id = '" . ciniki_core_dbQuote($ciniki, $args['level_id']) . "' "
-		. "";
-	
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-	$rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
-		array('container'=>'levels', 'fname'=>'id', 'name'=>'level',
-			'fields'=>array('id', 'name', 'permalink', 
-				'sequence', 'size')),
-	));
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	if( !isset($rc['levels']) || !isset($rc['levels'][0]) ) {
-		return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1696', 'msg'=>'Unable to find sponsorship level.'));
-	}
-	$level = $rc['levels'][0]['level'];
-	
-	return array('stat'=>'ok', 'level'=>$level);
+    $strsql = "SELECT ciniki_sponsor_levels.id, "
+        . "ciniki_sponsor_levels.name, "
+        . "ciniki_sponsor_levels.permalink, "
+        . "ciniki_sponsor_levels.sequence, "
+        . "ciniki_sponsor_levels.size "
+        . "FROM ciniki_sponsor_levels "
+        . "WHERE ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND ciniki_sponsor_levels.id = '" . ciniki_core_dbQuote($ciniki, $args['level_id']) . "' "
+        . "";
+    
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
+    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
+        array('container'=>'levels', 'fname'=>'id', 'name'=>'level',
+            'fields'=>array('id', 'name', 'permalink', 
+                'sequence', 'size')),
+    ));
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( !isset($rc['levels']) || !isset($rc['levels'][0]) ) {
+        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1696', 'msg'=>'Unable to find sponsorship level.'));
+    }
+    $level = $rc['levels'][0]['level'];
+    
+    return array('stat'=>'ok', 'level'=>$level);
 }
 ?>

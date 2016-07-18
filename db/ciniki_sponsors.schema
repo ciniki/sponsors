@@ -5,48 +5,48 @@
 #
 # Fields
 # ------
-# id:				The ID assigned to the sponsor.
-# uuid:				The Universal Unique ID.
-# business_id:		The business the sponsor is attached to.
-# title:			The name for the sponsor.
-# permalink:		The permalink for the sponsor.
+# id:               The ID assigned to the sponsor.
+# uuid:             The Universal Unique ID.
+# business_id:      The business the sponsor is attached to.
+# title:            The name for the sponsor.
+# permalink:        The permalink for the sponsor.
 #
-# level_id:			The ID for the sponsorship level.
-#					This is only used if module flag is specified.
+# level_id:         The ID for the sponsorship level.
+#                   This is only used if module flag is specified.
 #
-# sequence:			The display order for sponsors.
-# webflags:			Flags for display on website.
+# sequence:         The display order for sponsors.
+# webflags:         Flags for display on website.
 #
-#					0x01 - Hidden, do not show on website
+#                   0x01 - Hidden, do not show on website
 # 
-# url:				The url to their main site.
+# url:              The url to their main site.
 #
-# primary_image_id:	The ID of the sponsor image.
+# primary_image_id: The ID of the sponsor image.
 #
-# excerpt:			The excerpt for the sponsor. (full description for now)
-# content:			The full content, for the sponsor profile page. ** future **
+# excerpt:          The excerpt for the sponsor. (full description for now)
+# content:          The full content, for the sponsor profile page. ** future **
 #
-# notes:			Private notes on the sponsor.
+# notes:            Private notes on the sponsor.
 #
-# date_added:		The UTC date and time the record was added.
-# last_updated:		The UTC date and time the record was last updated.
+# date_added:       The UTC date and time the record was added.
+# last_updated:     The UTC date and time the record was last updated.
 #
 create table ciniki_sponsors (
-	id int not null auto_increment,
-	uuid char(36) not null,
-	business_id int not null,
-	title varchar(150) not null,
-	permalink varchar(150) not null,
-	level_id int not null,
-	sequence tinyint unsigned not null,
-	webflags tinyint unsigned not null,
-	url varchar(255) not null,
-	primary_image_id int not null,
-	excerpt varchar(10000) not null,
-	content text not null,
-	notes varchar(6000) not null,
-	date_added datetime not null,
-	last_updated datetime not null,
-	primary key (id),
-	index sync (business_id, uuid, last_updated)
+    id int not null auto_increment,
+    uuid char(36) not null,
+    business_id int not null,
+    title varchar(150) not null,
+    permalink varchar(150) not null,
+    level_id int not null,
+    sequence tinyint unsigned not null,
+    webflags tinyint unsigned not null,
+    url varchar(255) not null,
+    primary_image_id int not null,
+    excerpt varchar(10000) not null,
+    content text not null,
+    notes varchar(6000) not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    primary key (id),
+    index sync (business_id, uuid, last_updated)
 ) ENGINE='InnoDB', COMMENT='v1.01';

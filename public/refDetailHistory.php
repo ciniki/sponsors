@@ -10,10 +10,10 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:			The ID of the business to get the details for.
-// sponsor_id:			The ID of the sponsor to get the history for.
-// field:				The field to get the history for. This can be any of the elements 
-//						returned by the ciniki.sponsors.get method.
+// business_id:         The ID of the business to get the details for.
+// sponsor_id:          The ID of the sponsor to get the history for.
+// field:               The field to get the history for. This can be any of the elements 
+//                      returned by the ciniki.sponsors.get method.
 //
 // Returns
 // -------
@@ -23,30 +23,30 @@
 // </history>
 //
 function ciniki_sponsors_refDetailHistory($ciniki) {
-	//
-	// Find all the required and optional arguments
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
-	$rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-		'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
-		'detail_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Detail'), 
-		'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'), 
-		));
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
-	$args = $rc['args'];
-	
-	//
-	// Check access to business_id as owner, or sys admin
-	//
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-	$rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.refDetailHistory');
-	if( $rc['stat'] != 'ok' ) {
-		return $rc;
-	}
+    //
+    // Find all the required and optional arguments
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
+    $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
+        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'detail_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Detail'), 
+        'field'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'field'), 
+        ));
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $args = $rc['args'];
+    
+    //
+    // Check access to business_id as owner, or sys admin
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
+    $rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.refDetailHistory');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
 
-	ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
-	return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.sponsors', 'ciniki_sponsor_history', $args['business_id'], 'ciniki_sponsor_objrefdetails', $args['detail_id'], $args['field']);
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbGetModuleHistory');
+    return ciniki_core_dbGetModuleHistory($ciniki, 'ciniki.sponsors', 'ciniki_sponsor_history', $args['business_id'], 'ciniki_sponsor_objrefdetails', $args['detail_id'], $args['field']);
 }
 ?>
