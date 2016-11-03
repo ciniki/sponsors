@@ -42,6 +42,6 @@ function ciniki_sponsors_hooks_sponsorList($ciniki, $business_id, $args) {
         }
     }
 
-    return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2047', 'msg'=>'Unable to get the sponsor list'));
+    return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.1', 'msg'=>'Unable to get the sponsor list'));
 }
 ?>

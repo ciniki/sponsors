@@ -52,7 +52,7 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['ref']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2049', 'msg'=>'The reference does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.18', 'msg'=>'The reference does not exist.'));
     }
     $ref_uuid = $rc['ref']['uuid'];
 

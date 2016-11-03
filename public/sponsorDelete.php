@@ -51,7 +51,7 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['sponsor']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1627', 'msg'=>'The sponsor does not exist'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.15', 'msg'=>'The sponsor does not exist'));
     }
     $sponsor_uuid = $rc['sponsor']['uuid'];
 
@@ -69,7 +69,7 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
         return $rc;
     }
     if( isset($rc['num']['refs']) && $rc['num']['refs'] > 0 ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2056', 'msg'=>'All references to this sponsor must be removed before the sponsor can be deleted.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.16', 'msg'=>'All references to this sponsor must be removed before the sponsor can be deleted.'));
     }
 
     //

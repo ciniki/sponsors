@@ -68,7 +68,7 @@ function ciniki_sponsors_sponsorRefUpdate(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['ref']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'2051', 'msg'=>'Reference not found'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.20', 'msg'=>'Reference not found'));
     }
     $ref = $rc['ref'];
 

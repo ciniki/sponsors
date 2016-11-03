@@ -69,7 +69,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         return $rc;
     }
     if( !isset($rc['sponsors']) || !isset($rc['sponsors'][0]) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1687', 'msg'=>'Unable to find sponsor'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.17', 'msg'=>'Unable to find sponsor'));
     }
     $sponsor = $rc['sponsors'][0]['sponsor'];
 

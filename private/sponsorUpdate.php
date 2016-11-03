@@ -24,7 +24,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
         return $rc;
     }
     if( !isset($rc['sponsor']) ) {
-        return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1689', 'msg'=>'Sponsor not found'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.5', 'msg'=>'Sponsor not found'));
     }
     $sponsor = $rc['sponsor'];
 
@@ -45,7 +45,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
             return $rc;
         }
         if( $rc['num_rows'] > 0 ) {
-            return array('stat'=>'fail', 'err'=>array('pkg'=>'ciniki', 'code'=>'1690', 'msg'=>'You already have an sponsor with this title, please choose another title'));
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.6', 'msg'=>'You already have an sponsor with this title, please choose another title'));
         }
     }
 
