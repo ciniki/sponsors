@@ -58,7 +58,7 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
     //
     // Check if there are any objects still referencing this sponsor
     //
-    $strsql = "SELECT 'refs', COUNT(*) "
+/*    $strsql = "SELECT 'refs', COUNT(*) "
         . "FROM ciniki_sponsor_objrefs "
         . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
         . "AND sponsor_id = '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
@@ -70,7 +70,7 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
     }
     if( isset($rc['num']['refs']) && $rc['num']['refs'] > 0 ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.16', 'msg'=>'All references to this sponsor must be removed before the sponsor can be deleted.'));
-    }
+    } */
 
     //
     // Start transaction
@@ -84,13 +84,34 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
     $rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.sponsors');
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
-    }   
+    }
+
+    //
+    // Get the list of object refs for the sponsor
+    //
+    $strsql = "SELECT id, uuid "
+        . "FROM ciniki_sponsor_objrefs "
+        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "AND sponsor_id = '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'item');
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    if( isset($rc['rows']) ) {
+        foreach($rc['rows'] as $row) {
+            $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.sponsors.objref', $row['id'], $row['uuid'], 0x04);
+            if( $rc['stat'] != 'ok' ) {
+                ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
+                return $rc;
+            }
+        }
+    }
 
     //
     // Remove the sponsor
     //
-    $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.sponsors.sponsor', 
-        $args['sponsor_id'], $sponsor_uuid, 0x04);
+    $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.sponsors.sponsor', $args['sponsor_id'], $sponsor_uuid, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
         return $rc;
