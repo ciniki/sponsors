@@ -9,7 +9,7 @@
 // Returns
 // -------
 //
-function ciniki_sponsors_web_sponsorList($ciniki, $settings, $business_id) {
+function ciniki_sponsors_web_sponsorList($ciniki, $settings, $tnid) {
 
     $strsql = "SELECT ciniki_sponsors.id, "
         . "'' as category, "
@@ -24,9 +24,9 @@ function ciniki_sponsors_web_sponsorList($ciniki, $settings, $business_id) {
         . "FROM ciniki_sponsors "
         . "LEFT JOIN ciniki_sponsor_levels ON ("
             . "ciniki_sponsors.level_id = ciniki_sponsor_levels.id "
-            . "AND ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_sponsor_levels.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . ") "
-        . "WHERE ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         // Check the participant is visible on the website
         . "AND (ciniki_sponsors.webflags&0x01) = 0 "
         . "ORDER BY ciniki_sponsor_levels.sequence DESC, ciniki_sponsors.sequence DESC, title ";

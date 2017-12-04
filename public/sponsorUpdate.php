@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the sponsor is attached to.
+// tnid:     The ID of the tenant the sponsor is attached to.
 // name:            (optional) The new name of the sponsor.
 // url:             (optional) The new URL for the sponsor website.
 // description:     (optional) The new description for the sponsor.
@@ -25,7 +25,7 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'sponsor_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor'), 
         'title'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Title'), 
         'permalink'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Permalink'), 
@@ -46,10 +46,10 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.sponsorUpdate'); 
+    $rc = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.sponsorUpdate'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -69,7 +69,7 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
     // Update the sponsor
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'sponsorUpdate');
-    $rc = ciniki_sponsors__sponsorUpdate($ciniki, $args['business_id'], $args); 
+    $rc = ciniki_sponsors__sponsorUpdate($ciniki, $args['tnid'], $args); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -84,11 +84,11 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
     }
     
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'sponsors');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'sponsors');
 
     return array('stat'=>'ok');
 }

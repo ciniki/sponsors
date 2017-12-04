@@ -11,12 +11,12 @@
 // -------
 // <rsp stat='ok' />
 //
-function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
+function ciniki_sponsors__sponsorUpdate(&$ciniki, $tnid, $args) {
     //
     // Get the existing sponsor details
     //
     $strsql = "SELECT uuid FROM ciniki_sponsors "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'sponsor');
@@ -36,7 +36,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
         // Make sure the permalink is unique
         //
         $strsql = "SELECT id, title, permalink FROM ciniki_sponsors "
-            . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
             . "AND id <> '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
             . "";
@@ -72,7 +72,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
                 $strsql = "SELECT id "
                     . "FROM ciniki_sponsor_levels "
                     . "WHERE name = '" . ciniki_core_dbQuote($ciniki, $args['level']) . "' "
-                    . "AND business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+                    . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                     . "";
                 $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'level');
                 if( $rc['stat'] != 'ok' ) {
@@ -91,7 +91,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
                         'permalink'=>ciniki_core_makePermalink($ciniki, $args['level']),
                         'sequence'=>1,
                         );
-                    $rc = ciniki_core_objectAdd($ciniki, $business_id, 'ciniki.sponsors.level', $largs, 0x04);
+                    $rc = ciniki_core_objectAdd($ciniki, $tnid, 'ciniki.sponsors.level', $largs, 0x04);
                     if( $rc['stat'] != 'ok' ) { 
                         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
                         return $rc;
@@ -109,7 +109,7 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
     // Update the sponsor in the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-    $rc = ciniki_core_objectUpdate($ciniki, $business_id, 'ciniki.sponsors.sponsor', $args['sponsor_id'], $args, 0x04);
+    $rc = ciniki_core_objectUpdate($ciniki, $tnid, 'ciniki.sponsors.sponsor', $args['sponsor_id'], $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
         return $rc;
@@ -125,11 +125,11 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $business_id, $args) {
     }
     
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $business_id, 'ciniki', 'sponsors');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $tnid, 'ciniki', 'sponsors');
 
     return array('stat'=>'ok');
 }

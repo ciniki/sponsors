@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will delete a sponsor from the business.
+// This method will delete a sponsor from the tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the sponsor is attached to.
+// tnid:         The ID of the tenant the sponsor is attached to.
 // ref_id:              The ID of the sponsor ref to be removed.
 //
 // Returns
@@ -21,7 +21,7 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'ref_id'=>array('required'=>'yes', 'blank'=>'yes', 'name'=>'Reference'), 
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -30,10 +30,10 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $ac = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.sponsorRefDelete');
+    $ac = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.sponsorRefDelete');
     if( $ac['stat'] != 'ok' ) {
         return $ac;
     }
@@ -43,7 +43,7 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
     //
     $strsql = "SELECT uuid "
         . "FROM ciniki_sponsor_objrefs "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['ref_id']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
@@ -73,7 +73,7 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
     //
     // Remove the sponsor
     //
-    $rc = ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.sponsors.objref', 
+    $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.sponsors.objref', 
         $args['ref_id'], $ref_uuid, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
@@ -89,11 +89,11 @@ function ciniki_sponsors_sponsorRefDelete(&$ciniki) {
     }
 
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'sponsors');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'sponsors');
 
     return array('stat'=>'ok');
 }

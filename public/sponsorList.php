@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will return the list of sponsors for a business.  
+// This method will return the list of sponsors for a tenant.  
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get sponsors for.
+// tnid:     The ID of the tenant to get sponsors for.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_sponsors_sponsorList($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -28,10 +28,10 @@ function ciniki_sponsors_sponsorList($ciniki) {
     $args = $rc['args'];
     
     //  
-    // Check access to business_id as owner, or sys admin. 
+    // Check access to tnid as owner, or sys admin. 
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $ac = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.sponsorList');
+    $ac = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.sponsorList');
     if( $ac['stat'] != 'ok' ) { 
         return $ac;
     }
@@ -42,7 +42,7 @@ function ciniki_sponsors_sponsorList($ciniki) {
     //
     $strsql = "SELECT id, title  "
         . "FROM ciniki_sponsors "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     if( ($modules['ciniki.sponsors']['flags']&0x01) > 0 
         && isset($args['level_id']) && $args['level_id'] != '' ) {

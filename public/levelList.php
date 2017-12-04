@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will return the list of sponsorship levels for a business.  
+// This method will return the list of sponsorship levels for a tenant.  
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to get sponsorship levels for.
+// tnid:     The ID of the tenant to get sponsorship levels for.
 //
 // Returns
 // -------
@@ -19,7 +19,7 @@ function ciniki_sponsors_levelList($ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -27,10 +27,10 @@ function ciniki_sponsors_levelList($ciniki) {
     $args = $rc['args'];
     
     //  
-    // Check access to business_id as owner, or sys admin. 
+    // Check access to tnid as owner, or sys admin. 
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $ac = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.levelList');
+    $ac = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.levelList');
     if( $ac['stat'] != 'ok' ) { 
         return $ac;
     }   
@@ -44,9 +44,9 @@ function ciniki_sponsors_levelList($ciniki) {
         . "COUNT(ciniki_sponsors.id) AS num_sponsors "
         . "FROM ciniki_sponsor_levels "
         . "LEFT JOIN ciniki_sponsors ON (ciniki_sponsor_levels.id = ciniki_sponsors.level_id "
-            . "AND ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ")" 
-        . "WHERE ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_sponsor_levels.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "GROUP BY ciniki_sponsor_levels.id "
         . "ORDER BY ciniki_sponsor_levels.sequence DESC "
         . "";
@@ -69,7 +69,7 @@ function ciniki_sponsors_levelList($ciniki) {
     //
     $strsql = "SELECT 'sponsors', COUNT(*) "    
         . "FROM ciniki_sponsors "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND level_id = 0 "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');

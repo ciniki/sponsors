@@ -1,5 +1,5 @@
 //
-// This app will handle the listing, additions and deletions of events.  These are associated business.
+// This app will handle the listing, additions and deletions of events.  These are associated tenant.
 //
 function ciniki_sponsors_main() {
     this.webFlags = {'1':{'name':'Hidden'}};
@@ -29,7 +29,7 @@ function ciniki_sponsors_main() {
             };
         this.levels.liveSearchCb = function(s, i, value) {
             if( s == 'search' && value != '' ) {
-                M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'business_id':M.curBusinessID, 'start_needle':value, 'limit':'10'}, 
+                M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'tnid':M.curTenantID, 'start_needle':value, 'limit':'10'}, 
                     function(rsp) { 
                         M.ciniki_sponsors_main.levels.liveSearchShow('search', null, M.gE(M.ciniki_sponsors_main.levels.panelUID + '_' + s), rsp.sponsors); 
                     });
@@ -82,7 +82,7 @@ function ciniki_sponsors_main() {
             };
         this.ledit.fieldValue = function(s, i, d) { return this.data[i]; }
         this.ledit.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'business_id':M.curBusinessID, 
+            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
                 'sponsor_id':this.sponsor_id, 'field':i}};
         }
         this.ledit.addClose('Cancel');
@@ -147,7 +147,7 @@ function ciniki_sponsors_main() {
             };
         this.sedit.fieldValue = function(s, i, d) { return this.data[i]; }
         this.sedit.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'business_id':M.curBusinessID, 
+            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
                 'sponsor_id':this.sponsor_id, 'field':i}};
         }
         this.sedit.addDropImage = function(iid) {
@@ -180,7 +180,7 @@ function ciniki_sponsors_main() {
             return false;
         } 
 
-        if( (M.curBusiness.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
+        if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
             this.showLevels(cb);
         } else {
             this.showSponsors(cb, 0, 'Sponsors');
@@ -192,7 +192,7 @@ function ciniki_sponsors_main() {
     //
     this.showLevels = function(cb) {
         M.api.getJSONCb('ciniki.sponsors.levelList', 
-            {'business_id':M.curBusinessID}, function(rsp) {
+            {'tnid':M.curTenantID}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -208,7 +208,7 @@ function ciniki_sponsors_main() {
         this.ledit.reset();
         if( lid != null ) { this.ledit.level_id = lid; }
         if( this.ledit.level_id > 0 ) {
-            M.api.getJSONCb('ciniki.sponsors.levelGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.levelGet', {'tnid':M.curTenantID, 
                 'level_id':this.ledit.level_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -230,7 +230,7 @@ function ciniki_sponsors_main() {
             var c = this.ledit.serializeForm('no');
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.levelUpdate', 
-                    {'business_id':M.curBusinessID, 'level_id':M.ciniki_sponsors_main.ledit.level_id}, c,
+                    {'tnid':M.curTenantID, 'level_id':M.ciniki_sponsors_main.ledit.level_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -244,7 +244,7 @@ function ciniki_sponsors_main() {
         } else {
             var c = this.ledit.serializeForm('yes');
             M.api.postJSONCb('ciniki.sponsors.levelAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -257,7 +257,7 @@ function ciniki_sponsors_main() {
     this.removeLevel = function() {
         if( confirm("Are you sure you want to remove this level?") ) {
             M.api.getJSONCb('ciniki.sponsors.levelDelete', 
-                {'business_id':M.curBusinessID, 
+                {'tnid':M.curTenantID, 
                 'level_id':M.ciniki_sponsors_main.ledit.level_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -283,7 +283,7 @@ function ciniki_sponsors_main() {
             }
         }
         M.api.getJSONCb('ciniki.sponsors.sponsorList', 
-            {'business_id':M.curBusinessID, 'level_id':this.sponsors.level_id}, function(rsp) {
+            {'tnid':M.curTenantID, 'level_id':this.sponsors.level_id}, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
                     return false;
@@ -300,7 +300,7 @@ function ciniki_sponsors_main() {
         if( sid != null ) { this.sedit.sponsor_id = sid; }
         if( this.sedit.sponsor_id > 0 ) {
             this.sedit.sections._buttons.buttons.delete.visible = 'yes';
-            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 
                 'sponsor_id':this.sedit.sponsor_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -308,7 +308,7 @@ function ciniki_sponsors_main() {
                     }
                     var p = M.ciniki_sponsors_main.sedit;
                     p.data = rsp.sponsor;
-                    if( (M.curBusiness.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
+                    if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
                         p.sections.general.fields.level_id.options = {};
                         for(i in rsp.levels) {
                             p.sections.general.fields.level_id.options[rsp.levels[i].level.id] = rsp.levels[i].level.name;
@@ -326,7 +326,7 @@ function ciniki_sponsors_main() {
             if( lid != null && lid != 0 ) {
                 this.sedit.data.level_id = lid;
             }
-            if( (M.curBusiness.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
+            if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
                 var lvls = this.levels.data.levels;
                 for(i in lvls) {
                     this.sedit.sections.general.fields.level_id.options[lvls[i].level.id] = lvls[i].level.name;
@@ -345,7 +345,7 @@ function ciniki_sponsors_main() {
             var c = this.sedit.serializeForm('no');
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.sponsorUpdate', 
-                    {'business_id':M.curBusinessID, 'sponsor_id':this.sedit.sponsor_id}, c,
+                    {'tnid':M.curTenantID, 'sponsor_id':this.sedit.sponsor_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -359,7 +359,7 @@ function ciniki_sponsors_main() {
         } else {
             var c = this.sedit.serializeForm('yes');
             M.api.postJSONCb('ciniki.sponsors.sponsorAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -372,7 +372,7 @@ function ciniki_sponsors_main() {
     this.removeSponsor = function() {
         if( confirm("Are you sure you want to remove this sponsor?") ) {
             M.api.getJSONCb('ciniki.sponsors.sponsorDelete', 
-                {'business_id':M.curBusinessID, 
+                {'tnid':M.curTenantID, 
                 'sponsor_id':M.ciniki_sponsors_main.sedit.sponsor_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);

@@ -9,7 +9,7 @@
 // Returns
 // -------
 //
-function ciniki_sponsors_web_sponsorRefList($ciniki, $settings, $business_id, $object, $object_id) {
+function ciniki_sponsors_web_sponsorRefList($ciniki, $settings, $tnid, $object, $object_id) {
 
     $strsql = "SELECT ciniki_sponsors.id, "
         . "IFNULL(ciniki_sponsor_objrefdetails.title, '') AS d_title, "
@@ -25,17 +25,17 @@ function ciniki_sponsors_web_sponsorRefList($ciniki, $settings, $business_id, $o
         . "LEFT JOIN ciniki_sponsor_objrefdetails ON ("
             . "ciniki_sponsor_objrefs.object = ciniki_sponsor_objrefdetails.object "
             . "AND ciniki_sponsor_objrefs.object_id = ciniki_sponsor_objrefdetails.object_id "
-            . "AND ciniki_sponsor_objrefdetails.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_sponsor_objrefdetails.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . ") "
         . "LEFT JOIN ciniki_sponsors ON ("
             . "ciniki_sponsor_objrefs.sponsor_id = ciniki_sponsors.id "
-            . "AND ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . ") "
         . "LEFT JOIN ciniki_sponsor_levels ON ("
             . "ciniki_sponsors.level_id = ciniki_sponsor_levels.id "
-            . "AND ciniki_sponsor_levels.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "AND ciniki_sponsor_levels.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . ") "
-        . "WHERE ciniki_sponsor_objrefs.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+        . "WHERE ciniki_sponsor_objrefs.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         . "AND ciniki_sponsor_objrefs.object = '" . ciniki_core_dbQuote($ciniki, $object) . "' "
         . "AND ciniki_sponsor_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $object_id) . "' "
         // Check the participant is visible on the website

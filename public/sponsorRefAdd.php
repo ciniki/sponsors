@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will add a new sponsor for a business.
+// This method will add a new sponsor for a tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the sposnor to.
+// tnid:     The ID of the tenant to add the sposnor to.
 // title:           The title/name of the sponsor.
 // permalink:       (optional) The permalink to the sponsor, otherwise title will be made into permalink.
 // level_id:        (optional) Either the level_id or level must be specified.  If level_id > 0 it 
@@ -35,7 +35,7 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'sponsor_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor'), 
         'object'=>array('required'=>'yes', 'blank'=>'yes', 'name'=>'Object'), 
         'object_id'=>array('required'=>'yes', 'blank'=>'yes', 'name'=>'Object ID'), 
@@ -55,10 +55,10 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.sponsorRefAdd');
+    $rc = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.sponsorRefAdd');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
@@ -87,7 +87,7 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
         $args['sponsor_id'] = $rc['id'];
     } elseif( $args['sponsor_id'] > 0 ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'sponsorUpdate');
-        $rc = ciniki_sponsors__sponsorUpdate($ciniki, $args['business_id'], $args);
+        $rc = ciniki_sponsors__sponsorUpdate($ciniki, $args['tnid'], $args);
         if( $rc['stat'] != 'ok' ) {
             return $rc;
         }
@@ -107,7 +107,7 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
     //
     // Add the ref to the database
     //
-    $rc = ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.sponsors.objref', $args, 0x04);
+    $rc = ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.sponsors.objref', $args, 0x04);
     if( $rc['stat'] != 'ok' ) {
         ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
         return $rc;
@@ -124,11 +124,11 @@ function ciniki_sponsors_sponsorRefAdd(&$ciniki) {
     }
     
     //
-    // Update the last_change date in the business modules
+    // Update the last_change date in the tenant modules
     // Ignore the result, as we don't want to stop user updates if this fails.
     //
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'businesses', 'private', 'updateModuleChangeDate');
-    ciniki_businesses_updateModuleChangeDate($ciniki, $args['business_id'], 'ciniki', 'sponsors');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'updateModuleChangeDate');
+    ciniki_tenants_updateModuleChangeDate($ciniki, $args['tnid'], 'ciniki', 'sponsors');
 
     return array('stat'=>'ok', 'id'=>$ref_id);
 }

@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the sponsor is attached to.
+// tnid:     The ID of the tenant the sponsor is attached to.
 // name:            (optional) The new name of the sponsor.
 // url:             (optional) The new URL for the sponsor website.
 // description:     (optional) The new description for the sponsor.
@@ -25,7 +25,7 @@ function ciniki_sponsors_refDetailUpdate(&$ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'detail_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Reference'), 
         'object'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object'), 
         'object_id'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Object ID'), 
@@ -40,10 +40,10 @@ function ciniki_sponsors_refDetailUpdate(&$ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.refDetailUpdate'); 
+    $rc = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.refDetailUpdate'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }   
@@ -52,7 +52,7 @@ function ciniki_sponsors_refDetailUpdate(&$ciniki) {
     // Update the sponsor in the database
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectUpdate');
-    $rc = ciniki_core_objectUpdate($ciniki, $args['business_id'], 'ciniki.sponsors.objrefdetail', $args['detail_id'], $args, 0x07);
+    $rc = ciniki_core_objectUpdate($ciniki, $args['tnid'], 'ciniki.sponsors.objrefdetail', $args['detail_id'], $args, 0x07);
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }

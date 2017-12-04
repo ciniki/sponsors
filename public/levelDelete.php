@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will delete a sponsorship level from the business.
+// This method will delete a sponsorship level from the tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:         The ID of the business the level is attached to.
+// tnid:         The ID of the tenant the level is attached to.
 // level_id:            The ID of the level_id to be removed.
 //
 // Returns
@@ -21,7 +21,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'level_id'=>array('required'=>'yes', 'default'=>'', 'blank'=>'yes', 'name'=>'Level'), 
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -30,10 +30,10 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $ac = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.levelDelete');
+    $ac = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.levelDelete');
     if( $ac['stat'] != 'ok' ) {
         return $ac;
     }
@@ -43,7 +43,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     //
     $strsql = "SELECT 'sponsors', COUNT(*) "
         . "FROM ciniki_sponsors "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND level_id = '" . ciniki_core_dbQuote($ciniki, $args['level_id']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');
@@ -59,7 +59,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     // Get the uuid of the level to be deleted
     //
     $strsql = "SELECT uuid FROM ciniki_sponsor_levels "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND id = '" . ciniki_core_dbQuote($ciniki, $args['level_id']) . "' "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQuery');
@@ -75,7 +75,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     //
     // Remove the level
     //
-    return ciniki_core_objectDelete($ciniki, $args['business_id'], 'ciniki.sponsors.level', 
+    return ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.sponsors.level', 
         $args['level_id'], $level_uuid);
 }
 ?>

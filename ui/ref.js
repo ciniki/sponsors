@@ -37,7 +37,7 @@ function ciniki_sponsors_ref() {
         this.details.sectionData = function(s) { return this.data[s]; }
         this.details.fieldValue = function(s, i, d) { return this.data[i]; }
         this.details.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.sponsors.refDetailHistory', 'args':{'business_id':M.curBusinessID, 
+            return {'method':'ciniki.sponsors.refDetailHistory', 'args':{'tnid':M.curTenantID, 
                 'detail_id':this.detail_id, 'field':i}};
         };
         this.details.cellValue = function(s, i, j, d) {
@@ -83,7 +83,7 @@ function ciniki_sponsors_ref() {
         this.edit.liveSearchCb = function(s, i, value) {
             if( i == 'title' ) {
                 M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch',
-                    {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25}, function(rsp) {
+                    {'tnid':M.curTenantID, 'start_needle':value, 'limit':25}, function(rsp) {
                         M.ciniki_sponsors_ref.edit.liveSearchShow(s, i, M.gE(M.ciniki_sponsors_ref.edit.panelUID + '_' + i), rsp['sponsors']);
                     });
             }
@@ -102,13 +102,13 @@ function ciniki_sponsors_ref() {
         this.edit.fieldValue = function(s, i, d) { return this.data[i]; }
         this.edit.fieldHistoryArgs = function(s, i) {
             if( i == 'ref_sequence' ) {
-                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'tnid':M.curTenantID, 
                     'ref_id':this.ref_id, 'field':'sequence'}};
             } else if( i == 'ref_webflags' ) {
-                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'tnid':M.curTenantID, 
                     'ref_id':this.ref_id, 'field':'webflags'}};
             } else {
-                return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
                     'sponsor_id':this.sponsor_id, 'field':i}};
             }
         };
@@ -155,7 +155,7 @@ function ciniki_sponsors_ref() {
         if( obj != null ) { this.details.ref_object = obj; }
         if( oid != null ) { this.details.ref_object_id = oid; }
         if( this.details.detail_id > 0 ) {
-            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'tnid':M.curTenantID, 
                 'detail_id':this.details.detail_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -169,7 +169,7 @@ function ciniki_sponsors_ref() {
                     p.show(cb);
                 });
         } else if( this.details.ref_object != null && this.details.ref_object_id != null ) {
-            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'tnid':M.curTenantID, 
                 'object':this.details.ref_object, 'object_id':this.details.ref_object_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -188,7 +188,7 @@ function ciniki_sponsors_ref() {
 
     this.updateSponsors = function() {
         if( this.details.detail_id > 0 ) {
-            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'tnid':M.curTenantID, 
                 'detail_id':this.details.detail_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -200,7 +200,7 @@ function ciniki_sponsors_ref() {
                     p.show();
                 });
         } else if( this.details.ref_object != null && this.details.ref_object_id != null ) {
-            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.refDetailGet', {'tnid':M.curTenantID, 
                 'object':this.details.ref_object, 'object_id':this.details.ref_object_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -219,7 +219,7 @@ function ciniki_sponsors_ref() {
             var c = this.details.serializeForm('no');
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.refDetailUpdate', 
-                    {'business_id':M.curBusinessID, 'detail_id':this.details.detail_id}, c,
+                    {'tnid':M.curTenantID, 'detail_id':this.details.detail_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -235,7 +235,7 @@ function ciniki_sponsors_ref() {
             c += '&object=' + encodeURIComponent(this.details.ref_object);
             c += '&object_id=' + encodeURIComponent(this.details.ref_object_id);
             M.api.postJSONCb('ciniki.sponsors.refDetailAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -252,7 +252,7 @@ function ciniki_sponsors_ref() {
         if( sid != null ) { this.edit.sponsor_id = sid; }
         if( this.edit.ref_id > 0 && sid == null ) {
             this.edit.sections._buttons.buttons.delete.visible = 'yes';
-            M.api.getJSONCb('ciniki.sponsors.sponsorRefGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.sponsorRefGet', {'tnid':M.curTenantID, 
                 'ref_id':this.edit.ref_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -268,7 +268,7 @@ function ciniki_sponsors_ref() {
                 });
         } else if( this.edit.sponsor_id > 0 ) {
             this.edit.sections._buttons.buttons.delete.visible = 'no';
-            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 
                 'sponsor_id':this.edit.sponsor_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -300,7 +300,7 @@ function ciniki_sponsors_ref() {
             }
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.sponsorRefUpdate', 
-                    {'business_id':M.curBusinessID, 'ref_id':this.edit.ref_id}, c,
+                    {'tnid':M.curTenantID, 'ref_id':this.edit.ref_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -317,7 +317,7 @@ function ciniki_sponsors_ref() {
             c += '&object_id=' + encodeURIComponent(this.edit.ref_object_id);
             c += '&sponsor_id=' + encodeURIComponent(this.edit.sponsor_id);
             M.api.postJSONCb('ciniki.sponsors.sponsorRefAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -330,7 +330,7 @@ function ciniki_sponsors_ref() {
     this.removeSponsor = function() {
         if( confirm("Are you sure you want to remove this sponsor?") ) {
             M.api.getJSONCb('ciniki.sponsors.sponsorRefDelete', 
-                {'business_id':M.curBusinessID, 
+                {'tnid':M.curTenantID, 
                 'ref_id':M.ciniki_sponsors_ref.edit.ref_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);

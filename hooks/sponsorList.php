@@ -9,7 +9,7 @@
 // Returns
 // -------
 //
-function ciniki_sponsors_hooks_sponsorList($ciniki, $business_id, $args) {
+function ciniki_sponsors_hooks_sponsorList($ciniki, $tnid, $args) {
 
     if( isset($args['object']) && $args['object'] != '' 
         && isset($args['object_id']) && $args['object_id'] != '' 
@@ -20,9 +20,9 @@ function ciniki_sponsors_hooks_sponsorList($ciniki, $business_id, $args) {
             . "FROM ciniki_sponsor_objrefs "
             . "LEFT JOIN ciniki_sponsors ON ("
                 . "ciniki_sponsor_objrefs.sponsor_id = ciniki_sponsors.id "
-                . "AND ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+                . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                 . ") "
-            . "WHERE ciniki_sponsor_objrefs.business_id = '" . ciniki_core_dbQuote($ciniki, $business_id) . "' "
+            . "WHERE ciniki_sponsor_objrefs.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND ciniki_sponsor_objrefs.object = '" . ciniki_core_dbQuote($ciniki, $args['object']) . "' "
             . "AND ciniki_sponsor_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
             . "ORDER BY ciniki_sponsor_objrefs.sequence, ciniki_sponsors.title "

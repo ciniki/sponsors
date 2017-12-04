@@ -8,7 +8,7 @@
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business the sponsor is attached to.
+// tnid:     The ID of the tenant the sponsor is attached to.
 // detail_id:       The ID of the object ref sponsor to get the details for.
 // 
 // Returns
@@ -20,7 +20,7 @@ function ciniki_sponsors_refDetailGet($ciniki) {
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'detail_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Detail'), 
         'object'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object'), 
         'object_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object ID'), 
@@ -32,10 +32,10 @@ function ciniki_sponsors_refDetailGet($ciniki) {
     
     //  
     // Make sure this module is activated, and
-    // check permission to run this function for this business
+    // check permission to run this function for this tenant
     //  
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $rc = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.refDetailGet'); 
+    $rc = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.refDetailGet'); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
     }
@@ -48,7 +48,7 @@ function ciniki_sponsors_refDetailGet($ciniki) {
         . "ciniki_sponsor_objrefdetails.content, "
         . "ciniki_sponsor_objrefdetails.size "
         . "FROM ciniki_sponsor_objrefdetails "
-        . "WHERE ciniki_sponsor_objrefdetails.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_sponsor_objrefdetails.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "";
     if( isset($args['detail_id']) && $args['detail_id'] != '' ) {
         $strsql .= "AND ciniki_sponsor_objrefdetails.id = '" . ciniki_core_dbQuote($ciniki, $args['detail_id']) . "' ";
@@ -98,9 +98,9 @@ function ciniki_sponsors_refDetailGet($ciniki) {
         . "FROM ciniki_sponsor_objrefs "
         . "LEFT JOIN ciniki_sponsors ON ( "
             . "ciniki_sponsor_objrefs.sponsor_id = ciniki_sponsors.id "
-            . "AND ciniki_sponsors.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+            . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . ") "
-        . "WHERE ciniki_sponsor_objrefs.business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' "
+        . "WHERE ciniki_sponsor_objrefs.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "AND ciniki_sponsor_objrefs.object = '" . ciniki_core_dbQuote($ciniki, $detail['object']) . "' "
         . "AND ciniki_sponsor_objrefs.object_id = '" . ciniki_core_dbQuote($ciniki, $detail['object_id']) . "' "
         . "ORDER BY ciniki_sponsor_objrefs.sequence, ciniki_sponsors.title "

@@ -2,13 +2,13 @@
 //
 // Description
 // -----------
-// This method will add a new sponsorship level for a business.
+// This method will add a new sponsorship level for a tenant.
 //
 // Arguments
 // ---------
 // api_key:
 // auth_token:
-// business_id:     The ID of the business to add the level to.
+// tnid:     The ID of the tenant to add the level to.
 // name:            The title/name for the sponsorship level.
 // permalink:       (optional) The permalink to the level, otherwise title will be made into permalink.
 // sequence:        The position in the list of the level.
@@ -24,7 +24,7 @@ function ciniki_sponsors_levelAdd(&$ciniki) {
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
-        'business_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Business'), 
+        'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'name'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'), 
         'permalink'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Permalink'), 
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'1', 'name'=>'Sequence'), 
@@ -36,10 +36,10 @@ function ciniki_sponsors_levelAdd(&$ciniki) {
     $args = $rc['args'];
     
     //
-    // Check access to business_id as owner
+    // Check access to tnid as owner
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'checkAccess');
-    $ac = ciniki_sponsors_checkAccess($ciniki, $args['business_id'], 'ciniki.sponsors.levelAdd');
+    $ac = ciniki_sponsors_checkAccess($ciniki, $args['tnid'], 'ciniki.sponsors.levelAdd');
     if( $ac['stat'] != 'ok' ) {
         return $ac;
     }
@@ -59,7 +59,7 @@ function ciniki_sponsors_levelAdd(&$ciniki) {
     // Check the permalink doesn't already exist
     //
     $strsql = "SELECT id FROM ciniki_sponsor_levels "
-        . "WHERE business_id = '" . ciniki_core_dbQuote($ciniki, $args['business_id']) . "' " 
+        . "WHERE tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' " 
         . "AND permalink = '" . ciniki_core_dbQuote($ciniki, $args['permalink']) . "' "
         . "";
     $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'level');
@@ -73,6 +73,6 @@ function ciniki_sponsors_levelAdd(&$ciniki) {
     //
     // Add the level to the database
     //
-    return ciniki_core_objectAdd($ciniki, $args['business_id'], 'ciniki.sponsors.level', $args);
+    return ciniki_core_objectAdd($ciniki, $args['tnid'], 'ciniki.sponsors.level', $args);
 }
 ?>

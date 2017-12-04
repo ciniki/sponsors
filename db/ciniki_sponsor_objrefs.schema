@@ -8,7 +8,7 @@
 # ------
 # id:               The ID assigned to the sponsorship level.
 # uuid:             The Universal Unique ID.
-# business_id:      The business the sponsorship level is attached to.
+# tnid:             The tenant the sponsorship level is attached to.
 #
 # sponsor_id:       The ID of the sponsor attached to the object.
 # object:           The object the sponsor is attached to.  This is a reference
@@ -28,7 +28,7 @@
 create table ciniki_sponsor_objrefs (
     id int not null auto_increment,
     uuid char(36) not null,
-    business_id int not null,
+    tnid int not null,
     sponsor_id int not null,
     object varchar(100) not null,
     object_id varchar(100) not null,
@@ -38,5 +38,5 @@ create table ciniki_sponsor_objrefs (
     last_updated datetime not null,
     primary key (id),
     unique index (sponsor_id, object, object_id),
-    index sync (business_id, uuid, last_updated)
+    index sync (tnid, uuid, last_updated)
 ) ENGINE='InnoDB', COMMENT='v1.01';

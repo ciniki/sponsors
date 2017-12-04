@@ -1,5 +1,5 @@
 //
-// This app will handle the listing, additions and deletions of events.  These are associated business.
+// This app will handle the listing, additions and deletions of events.  These are associated tenant.
 //
 function ciniki_sponsors_refedit() {
     this.webFlags = {'1':{'name':'Hidden'}};
@@ -66,7 +66,7 @@ function ciniki_sponsors_refedit() {
         this.edit.liveSearchCb = function(s, i, value) {
             if( i == 'title' ) {
                 M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch',
-                    {'business_id':M.curBusinessID, 'start_needle':value, 'limit':25}, function(rsp) {
+                    {'tnid':M.curTenantID, 'start_needle':value, 'limit':25}, function(rsp) {
                         M.ciniki_sponsors_refedit.edit.liveSearchShow(s, i, M.gE(M.ciniki_sponsors_refedit.edit.panelUID + '_' + i), rsp['sponsors']);
                     });
             }
@@ -85,13 +85,13 @@ function ciniki_sponsors_refedit() {
         this.edit.fieldValue = function(s, i, d) { return this.data[i]; }
         this.edit.fieldHistoryArgs = function(s, i) {
             if( i == 'ref_sequence' ) {
-                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'tnid':M.curTenantID, 
                     'ref_id':this.ref_id, 'field':'sequence'}};
             } else if( i == 'ref_webflags' ) {
-                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorRefHistory', 'args':{'tnid':M.curTenantID, 
                     'ref_id':this.ref_id, 'field':'webflags'}};
             } else {
-                return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'business_id':M.curBusinessID, 
+                return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
                     'sponsor_id':this.sponsor_id, 'field':i}};
             }
         };
@@ -138,7 +138,7 @@ function ciniki_sponsors_refedit() {
         if( sid != null ) { this.edit.sponsor_id = sid; }
         if( this.edit.ref_id > 0 && sid == null ) {
             this.edit.sections._buttons.buttons.delete.visible = 'yes';
-            M.api.getJSONCb('ciniki.sponsors.sponsorRefGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.sponsorRefGet', {'tnid':M.curTenantID, 
                 'ref_id':this.edit.ref_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -154,7 +154,7 @@ function ciniki_sponsors_refedit() {
                 });
         } else if( this.edit.sponsor_id > 0 ) {
             this.edit.sections._buttons.buttons.delete.visible = 'no';
-            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'business_id':M.curBusinessID, 
+            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 
                 'sponsor_id':this.edit.sponsor_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
@@ -186,7 +186,7 @@ function ciniki_sponsors_refedit() {
             }
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.sponsorRefUpdate', 
-                    {'business_id':M.curBusinessID, 'ref_id':this.edit.ref_id}, c,
+                    {'tnid':M.curTenantID, 'ref_id':this.edit.ref_id}, c,
                     function(rsp) {
                         if( rsp.stat != 'ok' ) {
                             M.api.err(rsp);
@@ -203,7 +203,7 @@ function ciniki_sponsors_refedit() {
             c += '&object_id=' + encodeURIComponent(this.edit.ref_object_id);
             c += '&sponsor_id=' + encodeURIComponent(this.edit.sponsor_id);
             M.api.postJSONCb('ciniki.sponsors.sponsorRefAdd', 
-                {'business_id':M.curBusinessID}, c, function(rsp) {
+                {'tnid':M.curTenantID}, c, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
@@ -216,7 +216,7 @@ function ciniki_sponsors_refedit() {
     this.removeSponsor = function() {
         if( confirm("Are you sure you want to remove this sponsor?") ) {
             M.api.getJSONCb('ciniki.sponsors.sponsorRefDelete', 
-                {'business_id':M.curBusinessID, 
+                {'tnid':M.curTenantID, 
                 'ref_id':M.ciniki_sponsors_refedit.edit.ref_id}, function(rsp) {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);

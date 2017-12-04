@@ -7,7 +7,7 @@
 // Arguments
 // ---------
 // ciniki:
-// modules:         The modules that are enabled for the business.
+// modules:         The modules that are enabled for the tenant.
 //
 // Returns
 // -------
