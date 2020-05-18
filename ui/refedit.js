@@ -121,7 +121,7 @@ function ciniki_sponsors_refedit() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_sponsors_refedit', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
         if( args.ref_id != null ) {
@@ -214,7 +214,7 @@ function ciniki_sponsors_refedit() {
     };
 
     this.removeSponsor = function() {
-        if( confirm("Are you sure you want to remove this sponsor?") ) {
+        M.confirm("Are you sure you want to remove this sponsor?",null,function() {
             M.api.getJSONCb('ciniki.sponsors.sponsorRefDelete', 
                 {'tnid':M.curTenantID, 
                 'ref_id':M.ciniki_sponsors_refedit.edit.ref_id}, function(rsp) {
@@ -224,6 +224,6 @@ function ciniki_sponsors_refedit() {
                     }
                     M.ciniki_sponsors_refedit.edit.close();
                 });
-        }
+        });
     }
 };

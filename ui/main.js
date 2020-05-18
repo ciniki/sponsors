@@ -176,7 +176,7 @@ function ciniki_sponsors_main() {
         //
         var appContainer = M.createContainer(appPrefix, 'ciniki_sponsors_main', 'yes');
         if( appContainer == null ) {
-            alert('App Error');
+            M.alert('App Error');
             return false;
         } 
 
@@ -255,7 +255,7 @@ function ciniki_sponsors_main() {
     };
 
     this.removeLevel = function() {
-        if( confirm("Are you sure you want to remove this level?") ) {
+        M.confirm("Are you sure you want to remove this level?",null,function() {
             M.api.getJSONCb('ciniki.sponsors.levelDelete', 
                 {'tnid':M.curTenantID, 
                 'level_id':M.ciniki_sponsors_main.ledit.level_id}, function(rsp) {
@@ -265,7 +265,7 @@ function ciniki_sponsors_main() {
                     }
                     M.ciniki_sponsors_main.ledit.close();
                 });
-        }
+        });
     }
 
     //
@@ -370,7 +370,7 @@ function ciniki_sponsors_main() {
     };
 
     this.removeSponsor = function() {
-        if( confirm("Are you sure you want to remove this sponsor?") ) {
+        M.confirm("Are you sure you want to remove this sponsor?",null,function() {
             M.api.getJSONCb('ciniki.sponsors.sponsorDelete', 
                 {'tnid':M.curTenantID, 
                 'sponsor_id':M.ciniki_sponsors_main.sedit.sponsor_id}, function(rsp) {
@@ -380,6 +380,6 @@ function ciniki_sponsors_main() {
                     }
                     M.ciniki_sponsors_main.sedit.close();
                 });
-        }
+        });
     }
 };
