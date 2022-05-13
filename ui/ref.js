@@ -3,7 +3,7 @@
 //
 function ciniki_sponsors_ref() {
     this.webFlags = {'1':{'name':'Hidden'}};
-    this.sizeOptions = {'10':'Tiny', '20':'Small', '30':'Medium', '40':'Large', '50':'X-Large'};
+    this.sizeOptions = {'10':'Tiny', '20':'Small', '30':'Medium', '40':'Large', '50':'X-Large', '90':'XX-Large'};
     //
     // Panels
     //
