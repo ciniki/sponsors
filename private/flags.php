@@ -20,7 +20,7 @@ function ciniki_sponsors_flags($ciniki, $modules) {
 //      array('flag'=>array('bit'=>'3', 'name'=>'')),
 //      array('flag'=>array('bit'=>'4', 'name'=>'')),
         // 0x10
-//      array('flag'=>array('bit'=>'5', 'name'=>'')),
+        array('flag'=>array('bit'=>'5', 'name'=>'Packages')),       // SAPOS integration
 //      array('flag'=>array('bit'=>'6', 'name'=>'')),
 //      array('flag'=>array('bit'=>'7', 'name'=>'')),
 //      array('flag'=>array('bit'=>'8', 'name'=>'')),

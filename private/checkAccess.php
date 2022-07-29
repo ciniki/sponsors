@@ -14,7 +14,7 @@
 // -------
 // <rsp stat='ok' />
 //
-function ciniki_sponsors_checkAccess($ciniki, $tnid, $method) {
+function ciniki_sponsors_checkAccess(&$ciniki, $tnid, $method) {
     //
     // Check if the tenant is active and the module is enabled
     //
@@ -24,6 +24,7 @@ function ciniki_sponsors_checkAccess($ciniki, $tnid, $method) {
         return $rc;
     }
     $modules = $rc['modules'];
+//    $ciniki['tenant']['modules'] = $modules;
 
     if( !isset($rc['ruleset']) ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.2', 'msg'=>'No permissions granted'));

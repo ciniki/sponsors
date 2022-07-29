@@ -37,6 +37,20 @@ function ciniki_sponsors_hooks_uiSettings($ciniki, $tnid, $args) {
         $rsp['menu_items'][] = $menu_item;
     } 
 
+    //
+    // Sponsor packages
+    //
+    if( isset($ciniki['tenant']['modules']['ciniki.sponsors'])
+        && isset($ciniki['tenant']['modules']['ciniki.sapos'])
+        && ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x10)
+        && (isset($args['permissions']['owners'])
+            || isset($args['permissions']['resellers'])
+            || ($ciniki['session']['user']['perms']&0x01) == 0x01
+            )
+        ) {
+        $rsp['settings_menu_items'][] = array('priority'=>1700, 'label'=>'Sponsors', 'edit'=>array('app'=>'ciniki.sponsors.settings'));
+    }
+
     return $rsp;
 }
 ?>
