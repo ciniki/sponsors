@@ -134,6 +134,10 @@ function ciniki_sponsors_packageGet($ciniki) {
     }
     $rsp['objects'] = isset($rc['objects']) ? $rc['objects'] : array();
 
+    uasort($rsp['objects'], function($a, $b) {
+        return strcmp($a['full_name'], $b['full_name']);
+        });
+
     //
     // Add the None option
     //
