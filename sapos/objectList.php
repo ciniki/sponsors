@@ -20,21 +20,21 @@ function ciniki_sponsors_sapos_objectList($ciniki, $tnid) {
 //        'ciniki.sponsors.package.ciniki.events' => array(
 //            'name' => 'All Events Sponsorship',
 //            ),
-        'ciniki.sponsors.package.ciniki.events.event' => array(
+        'ciniki.sponsors.package' => array(
             'name' => 'Event Sponsorship',
             ),
 //        'ciniki.sponsors.package.ciniki.courses' => array(
 //            'name' => 'All Programs Sponsorship',
 //            ),
-        'ciniki.sponsors.package.ciniki.courses.course' => array(
-            'name' => 'Program Sponsorship',
-            ),
+//        'ciniki.sponsors.package.ciniki.courses.course' => array(
+//            'name' => 'Program Sponsorship',
+//            ),
 //        'ciniki.sponsors.package.ciniki.ags' => array(
 //            'name' => 'Gallery Sponsorship',
 //            ),
-        'ciniki.sponsors.package.ciniki.ags.exhibit' => array(
-            'name' => 'Exhibit Sponsorship',
-            ),
+//        'ciniki.sponsors.package.ciniki.ags.exhibit' => array(
+//            'name' => 'Exhibit Sponsorship',
+//            ),
         );
 
     return array('stat'=>'ok', 'objects'=>$objects);

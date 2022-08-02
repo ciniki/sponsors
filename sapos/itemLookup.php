@@ -22,7 +22,8 @@ function ciniki_sponsors_sapos_itemLookup($ciniki, $tnid, $args) {
     // An event was added to an invoice item, get the details and see if we need to 
     // create a registration for this event
     //
-    if( strncmp($args['object'], 'ciniki.sponsors.package.', 24) == 0 ) {
+    //if( strncmp($args['object'], 'ciniki.sponsors.package.', 24) == 0 ) {
+    if( $args['object'] == 'ciniki.sponsors.package' ) {
         $strsql = "SELECT packages.id, "
             . "packages.name, "
             . "packages.invoice_code, "
@@ -50,7 +51,8 @@ function ciniki_sponsors_sapos_itemLookup($ciniki, $tnid, $args) {
             'category' => $package['category'],
             'code' => $package['invoice_code'],
             'description' => ($package['invoice_name'] != '' ? $package['invoice_name'] : $package['name']),
-            'object'=>'ciniki.sponsors.package.' . $package['object'],
+            'object'=>'ciniki.sponsors.package',
+            //'object'=>'ciniki.sponsors.package.' . $package['object'],
             'object_id'=>$package['id'],
             'description'=>$package['invoice_name'],
             'quantity'=>1,
