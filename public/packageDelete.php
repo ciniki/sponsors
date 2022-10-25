@@ -50,7 +50,7 @@ function ciniki_sponsors_packageDelete(&$ciniki) {
         return $rc;
     }
     if( !isset($rc['package']) ) {
-        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.24', 'msg'=>'Sponsor Package does not exist.'));
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.43', 'msg'=>'Sponsor Package does not exist.'));
     }
     $package = $rc['package'];
 
