@@ -59,6 +59,24 @@ function ciniki_sponsors_packageAdd(&$ciniki) {
     }
 
     //
+    // Check if changes to object
+    //
+    if( isset($args['attached_to']) ) {
+        if( $args['attached_to'] == '' ) {
+            $args['object'] = '';
+            $args['object_id'] = '';
+        } elseif( preg_match("/^([^\.]*)\.([^\.]*)\.([^\.]*)\.(.*)$/", $args['attached_to'], $m) ) {
+            $object = $m[1] . '.' . $m[2] . '.' . $m[3];
+            if( !isset($args['object']) || $args['object'] != $object ) {
+                $args['object'] = $object;
+            }
+            if( !isset($args['object_id']) || $args['object_id'] != $m[4] ) {
+                $args['object_id'] = $m[4];
+            }
+        }
+    }
+
+    //
     // Make sure the permalink is unique
     //
     $strsql = "SELECT id, name, permalink "

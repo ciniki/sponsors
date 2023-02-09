@@ -120,16 +120,15 @@ function ciniki_sponsors_settings() {
     this.package.fieldHistoryArgs = function(s, i) {
         return {'method':'ciniki.sponsors.packageHistory', 'args':{'tnid':M.curTenantID, 'package_id':this.package_id, 'field':i}};
     }
-    this.package.open = function(cb, pid, list) {
+    this.package.open = function(cb, pid, list, obj, oid) {
         if( pid != null ) { this.package_id = pid; }
         if( list != null ) { this.nplist = list; }
-        M.api.getJSONCb('ciniki.sponsors.packageGet', {'tnid':M.curTenantID, 'package_id':this.package_id}, function(rsp) {
+        M.api.getJSONCb('ciniki.sponsors.packageGet', {'tnid':M.curTenantID, 'package_id':this.package_id, 'object':obj, 'object_id':oid}, function(rsp) {
             if( rsp.stat != 'ok' ) {
                 M.api.err(rsp);
                 return false;
             }
             var p = M.ciniki_sponsors_settings.package;
-            console.log(rsp);
             p.data = rsp.package;
             p.sections.general.fields.amount.visible = ((rsp.package.flags&0x02) == 0x02 ? 'yes' : 'no');
             p.sections.general.fields.attached_to.options = rsp.objects;
@@ -216,6 +215,10 @@ function ciniki_sponsors_settings() {
             return false;
         } 
 
-        this.menu.open(cb);
+        if( args.package_id != null ) {
+            this.package.open(cb, args.package_id, null, args.object, args.object_id);
+        } else {
+            this.menu.open(cb);
+        }
     }
 }

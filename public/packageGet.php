@@ -22,6 +22,8 @@ function ciniki_sponsors_packageGet($ciniki) {
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'package_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor Package'),
+        'object'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object'),
+        'object_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object ID'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -64,9 +66,9 @@ function ciniki_sponsors_packageGet($ciniki) {
             'invoice_code'=>'',
             'invoice_name'=>'',
             'flags'=>'0',
-            'attached_to'=>'',
-            'object'=>'',
-            'object_id'=>'',
+            'attached_to'=>(isset($args['object']) && isset($args['object_id']) ? $args['object'] . '.' . $args['object_id'] : ''),
+            'object'=>isset($args['object']) ? $args['object'] : '',
+            'object_id'=>isset($args['object_id']) ? $args['object_id'] : '',
             'category'=>'',
             'sequence'=>'',
             'amount'=>'',
