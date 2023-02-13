@@ -33,7 +33,10 @@ function ciniki_sponsors_wng_process(&$ciniki, $tnid, &$request, $section) {
     //
     // Check which section to process
     //
-    if( $section['ref'] == 'ciniki.sponsors.packages' ) {
+    if( $section['ref'] == 'ciniki.sponsors.level' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'wng', 'levelProcess');
+        return ciniki_sponsors_wng_levelProcess($ciniki, $tnid, $request, $section);
+    } elseif( $section['ref'] == 'ciniki.sponsors.packages' ) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'wng', 'packagesProcess');
         return ciniki_sponsors_wng_packagesProcess($ciniki, $tnid, $request, $section);
     }

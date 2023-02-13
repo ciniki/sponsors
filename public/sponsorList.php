@@ -48,7 +48,7 @@ function ciniki_sponsors_sponsorList($ciniki) {
         && isset($args['level_id']) && $args['level_id'] != '' ) {
         $strsql .= "AND level_id = '" . ciniki_core_dbQuote($ciniki, $args['level_id']) . "' ";
     }
-    $strsql .= "ORDER BY ciniki_sponsors.sequence DESC, ciniki_sponsors.title "
+    $strsql .= "ORDER BY ciniki_sponsors.sequence, ciniki_sponsors.title "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
     $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(

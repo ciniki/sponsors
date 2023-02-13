@@ -48,7 +48,7 @@ function ciniki_sponsors_levelList($ciniki) {
             . ")" 
         . "WHERE ciniki_sponsor_levels.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
         . "GROUP BY ciniki_sponsor_levels.id "
-        . "ORDER BY ciniki_sponsor_levels.sequence DESC "
+        . "ORDER BY ciniki_sponsor_levels.sequence "
         . "";
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
     $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
