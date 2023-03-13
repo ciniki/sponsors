@@ -26,7 +26,9 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
     //
     $strsql = "SELECT id, "
         . "primary_image_id, "
-        . "url "
+        . "url, "
+        . "title, "
+        . "excerpt AS synopsis "
         . "FROM ciniki_sponsors "
         . "WHERE ciniki_sponsors.level_id = '" . ciniki_core_dbQuote($ciniki, $s['level-id']) . "' "
         . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
@@ -35,7 +37,7 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
     $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
         array('container'=>'sponsors', 'fname'=>'id', 
-            'fields'=>array('id', 'image-id' => 'primary_image_id', 'url'),
+            'fields'=>array('id', 'image-id' => 'primary_image_id', 'url', 'title', 'synopsis'),
             ),
         ));
     if( $rc['stat'] != 'ok' ) {
@@ -54,13 +56,24 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
                 'title' => $s['title'],
                 );
         }
-        $blocks[] = array(
-            'type' => 'imagebuttons',
-            'class' => 'sponsors-level sponsors-level-' . $levelclass,
-            'image-format' => 'padded',
-            'image-ratio' => '4-3',
-            'items' => $sponsors,
-            );
+        if( isset($s['layout']) && $s['layout'] == 'flexcards' ) {
+            $blocks[] = array(
+                'type' => 'flexcards',
+                'class' => 'sponsors-level sponsors-level-' . $levelclass,
+                'image-format' => 'padded',
+                'image-ratio' => '4-3',
+                'items' => $sponsors,
+                );
+
+        } else {
+            $blocks[] = array(
+                'type' => 'imagebuttons',
+                'class' => 'sponsors-level sponsors-level-' . $levelclass,
+                'image-format' => 'padded',
+                'image-ratio' => '4-3',
+                'items' => $sponsors,
+                );
+        }
     }
 
 
