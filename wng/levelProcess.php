@@ -26,9 +26,13 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
     //
     $strsql = "SELECT id, "
         . "primary_image_id, "
-        . "url, "
-        . "title, "
-        . "excerpt AS synopsis "
+        . "url, ";
+    if( isset($s['layout']) && $s['layout'] == 'flexcards' ) {
+        $strsql .= "title, ";
+    } else {
+        $strsql .= "'' AS title, ";
+    }
+    $strsql .= "excerpt AS synopsis "
         . "FROM ciniki_sponsors "
         . "WHERE ciniki_sponsors.level_id = '" . ciniki_core_dbQuote($ciniki, $s['level-id']) . "' "
         . "AND ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
@@ -64,7 +68,6 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
                 'image-ratio' => '4-3',
                 'items' => $sponsors,
                 );
-
         } else {
             $blocks[] = array(
                 'type' => 'imagebuttons',
