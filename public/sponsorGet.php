@@ -211,7 +211,10 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         //
         // Get the list of donated items
         //
-        if( isset($args['donateditems']) && $args['donateditems'] == 'yes' && ciniki_core_checkModuleActive($ciniki, 'ciniki.ags') ) {
+        if( isset($args['donateditems']) && $args['donateditems'] == 'yes' 
+            && ciniki_core_checkModuleActive($ciniki, 'ciniki.ags') 
+            && $sponsor['customer_id'] > 0 
+            ) {
             ciniki_core_loadMethod($ciniki, 'ciniki', 'ags', 'hooks', 'uiCustomersData');
             $rc = ciniki_ags_hooks_uiCustomersData($ciniki, $args['tnid'], array(
                 'customer_id' => $sponsor['customer_id'],
