@@ -116,6 +116,18 @@ function ciniki_sponsors__sponsorUpdate(&$ciniki, $tnid, $args) {
     }
 
     //
+    // Update the sponsor categories
+    //
+    if( isset($args['categories']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'sponsorCategoriesUpdate');
+        $rc = ciniki_sponsors_sponsorCategoriesUpdate($ciniki, $args['tnid'], $args['sponsor_id'], $args['categories']);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
+            return $rc;
+        }
+    }
+
+    //
     // Commit the transaction
     //
     $rc = ciniki_core_dbTransactionCommit($ciniki, 'ciniki.sponsors');

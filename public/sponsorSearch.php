@@ -54,18 +54,14 @@ function ciniki_sponsors_sponsorSearch($ciniki) {
         . "";
     $strsql .= "ORDER BY ciniki_sponsors.title "
         . "";
-    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
-    $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
-        array('container'=>'sponsors', 'fname'=>'id', 'name'=>'sponsor',
-            'fields'=>array('id', 'title', 'level_name'=>'name')),
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
+    $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
+        array('container'=>'sponsors', 'fname'=>'id', 'fields'=>array('id', 'title', 'level_name'=>'name')),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if( !isset($rc['sponsors']) ) {
-        return array('stat'=>'ok', 'sponsors'=>array());
-    }
-    $sponsors = $rc['sponsors'];
+    $sponsors = isset($rc['sponsors']) ? $rc['sponsors'] : array();
 
     return array('stat'=>'ok', 'sponsors'=>$sponsors);
 }

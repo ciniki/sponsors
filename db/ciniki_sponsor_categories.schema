@@ -1,0 +1,30 @@
+#
+# Description
+# -----------
+# This table stores the sponsorship categories for the sponsors.
+#
+# Fields
+# ------
+# id:               The ID assigned to the sponsorship level.
+# uuid:             The Universal Unique ID.
+# tnid:             The tenant the sponsorship level is attached to.
+#
+# name:             The name for the sponsorship level.
+#
+# sequence:         The display order for sponsors.
+#
+# date_added:       The UTC date and time the record was added.
+# last_updated:     The UTC date and time the record was last updated.
+#
+create table ciniki_sponsor_categories (
+    id int not null auto_increment,
+    uuid char(36) not null,
+    tnid int not null,
+    name varchar(150) not null,
+    sequence tinyint unsigned not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    primary key (id),
+    unique index (uuid),
+    index sync (tnid, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';

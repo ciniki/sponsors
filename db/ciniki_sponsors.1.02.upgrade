@@ -1,0 +1,2 @@
+ALTER TABLE ciniki_sponsors ADD COLUMN customer_id int not null AFTER permalink;
+ALTER TABLE ciniki_sponsors COMMENT='v1.02';

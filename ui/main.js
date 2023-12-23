@@ -4,163 +4,592 @@
 function ciniki_sponsors_main() {
     this.webFlags = {'1':{'name':'Hidden'}};
     this.sizeOptions = {'10':'Tiny', '20':'Small', '30':'Medium', '40':'Large', '50':'X-Large'};
+
     //
-    // Panels
+    // The sponsors panel
     //
-    this.init = function() {
-        //
-        // The levels panel, if they have sponsor levels enabled
-        //
-        this.levels = new M.panel('Sponsorship Levels',
-            'ciniki_sponsors_main', 'levels',
-            'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.levels');
-        this.levels.sections = {
-            'search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':2,
-                'hint':'Search sponsors', 'noData':'No sponsors found',
-                'headerValues':['Sponsors', 'Level'],
-                },
-            'levels':{'label':'Sponsorship Levels', 'type':'simplegrid', 'num_cols':1,
-                'headerValues':null,
-                'cellClasses':[''],
-                'noData':'No sponsor levels defined',
-                'addTxt':'Add Sponsorship Level',
-                'addFn':'M.ciniki_sponsors_main.showLevelEdit(\'M.ciniki_sponsors_main.showLevels();\',0);',
-                },
-            };
-        this.levels.liveSearchCb = function(s, i, value) {
-            if( s == 'search' && value != '' ) {
-                M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'tnid':M.curTenantID, 'start_needle':value, 'limit':'10'}, 
-                    function(rsp) { 
-                        M.ciniki_sponsors_main.levels.liveSearchShow('search', null, M.gE(M.ciniki_sponsors_main.levels.panelUID + '_' + s), rsp.sponsors); 
-                    });
-                return true;
-            }
-        };
-        this.levels.liveSearchResultValue = function(s, f, i, j, d) {
-            if( s == 'search' ) { 
-                switch(j) {
-                    case 0: return d.sponsor.title;
-                    case 1: return (d.sponsor.level_name!=null?d.sponsor.level_name:'No sponsorship level');
-                }
-            }
-            return '';
-        };
-        this.levels.liveSearchResultRowFn = function(s, f, i, j, d) { 
-            return 'M.ciniki_sponsors_main.showSponsorEdit(\'M.ciniki_sponsors_main.showLevels();\',\'' + d.sponsor.id + '\');'; 
-        };
-        this.levels.sectionData = function(s) { return this.data[s]; }
-        this.levels.noData = function(s) { return this.sections[s].noData; }
-        this.levels.cellValue = function(s, i, j, d) {
-            return d.level.name + '<span class="count">' + d.level.num_sponsors + '</span>';
-            };
-        this.levels.rowFn = function(s, i, d) {
-            return 'M.ciniki_sponsors_main.showSponsors(\'M.ciniki_sponsors_main.showLevels();\',\'' + d.level.id + '\',\'' + escape(d.level.name) + '\');';
-        };
-        this.levels.addClose('Back');
-
-        //
-        // The level edit panel
-        //
-        this.ledit = new M.panel('Sponsorship Level',
-            'ciniki_sponsors_main', 'ledit',
-            'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.ledit');
-        this.ledit.data = null;
-        this.ledit.sponsor_id = 0;
-        this.ledit.sections = {
-            '_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
-                'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
+    this.sponsors = new M.panel('Sponsors',
+        'ciniki_sponsors_main', 'sponsors',
+        'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.sponsors');
+    this.sponsors.level_id = 0;
+    this.sponsors.category_id = 0;
+    this.sponsors.sections = {
+        '_tabs':{'label':'', 'selected':'categories', 'aside':'yes',
+            'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x05); },
+            'tabs':{
+                'levels':{'label':'Levels', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("levels");'},
+                'categories':{'label':'Categories', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("categories");'},
             }},
-            'general':{'label':'', 'fields':{
-                'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
-                'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
-                'size':{'label':'Size', 'type':'toggle', 'toggles':this.sizeOptions},
-                }}, 
-            '_buttons':{'label':'', 'buttons':{
-                'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.saveLevel();'},
-                'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.removeLevel();'},
-                }},
-            };
-        this.ledit.fieldValue = function(s, i, d) { return this.data[i]; }
-        this.ledit.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
-                'sponsor_id':this.sponsor_id, 'field':i}};
-        }
-        this.ledit.addClose('Cancel');
-
-        
-        //
-        // The sponsors panel
-        //
-        this.sponsors = new M.panel('Sponsors',
-            'ciniki_sponsors_main', 'sponsors',
-            'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.sponsors');
-        this.sponsors.level_id = 0;
-        this.sponsors.sections = {
-            'sponsors':{'label':'Sponsors', 'type':'simplegrid', 'num_cols':1,
-                'headerValues':null,
-                'cellClasses':[''],
-                'noData':'No sponsors',
-                'addTxt':'Add Sponsor',
-                'addFn':'M.ciniki_sponsors_main.showSponsorEdit(\'M.ciniki_sponsors_main.showSponsors();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
-                },
-            };
-        this.sponsors.sectionData = function(s) { return this.data[s]; }
-        this.sponsors.noData = function(s) { return this.sections[s].noData; }
-        this.sponsors.cellValue = function(s, i, j, d) {
-            return d.sponsor.title;
-            };
-        this.sponsors.rowFn = function(s, i, d) {
-            return 'M.ciniki_sponsors_main.showSponsorEdit(\'M.ciniki_sponsors_main.showSponsors();\',\'' + d.sponsor.id + '\');';
+        'levels':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
+            'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x01) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'levels' ? 'yes' : 'no'; },
+            'editFn':function(s, i, d) {
+                return 'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+            },
+            'addTxt':'Add Level',
+            'addFn':'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+            },
+        'categories':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
+            'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x04) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'categories' ? 'yes' : 'no'; },
+            'editFn':function(s, i, d) {
+                return 'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+            },
+            'addTxt':'Add Category',
+            'addFn':'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+            },
+        'search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':1,
+            'hint':'Search Sponsors', 
+            'noData':'No sponsors found',
+//            'headerValues':['Sponsors', 'Level'],
+            },
+        'sponsors':{'label':'Sponsors', 'type':'simplegrid', 'num_cols':1,
+            'headerValues':null,
+            'cellClasses':[''],
+            'noData':'No sponsors',
+            'addTxt':'Add Sponsor',
+            'addFn':'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
+            },
         };
-        this.sponsors.addClose('Back');
-
-        //
-        // The sponsor edit panel
-        //
-        this.sedit = new M.panel('Sponsor',
-            'ciniki_sponsors_main', 'sedit',
-            'mc', 'medium mediumaside', 'sectioned', 'ciniki.sponsors.main.sedit');
-        this.sedit.data = null;
-        this.sedit.level_id = 0;
-        this.sedit.sponsor_id = 0;
-        this.sedit.sections = {
-            '_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
-                'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
-            }},
-            'general':{'label':'General', 'aside':'yes', 'fields':{
-                'title':{'label':'Name', 'hint':'Sponsor name', 'type':'text'},
-                'level_id':{'label':'Level', 'active':'no', 'type':'select', 'options':{}},
-                'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
-                'webflags':{'label':'Website', 'type':'flags', 'toggle':'no', 'join':'yes', 'flags':this.webFlags},
-                'url':{'label':'URL', 'hint':'Enter the http:// address for the sponsors website', 'type':'text'},
-                }}, 
-            '_excerpt':{'label':'Description', 'fields':{
-                'excerpt':{'label':'', 'hidelabel':'yes', 'hint':'', 'type':'textarea'},
-                }},
-            '_notes':{'label':'Notes', 'fields':{
-                'notes':{'label':'', 'hidelabel':'yes', 'hint':'', 'type':'textarea'},
-                }},
-            '_buttons':{'label':'', 'buttons':{
-                'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.saveSponsor();'},
-                'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.removeSponsor();'},
-                }},
-            };
-        this.sedit.fieldValue = function(s, i, d) { return this.data[i]; }
-        this.sedit.fieldHistoryArgs = function(s, i) {
-            return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
-                'sponsor_id':this.sponsor_id, 'field':i}};
-        }
-        this.sedit.addDropImage = function(iid) {
-            M.ciniki_sponsors_main.sedit.setFieldValue('primary_image_id', iid, null, null);
+    this.sponsors.liveSearchCb = function(s, i, value) {
+        if( s == 'search' && value != '' ) {
+            M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'tnid':M.curTenantID, 'start_needle':value, 'limit':'10'}, 
+                function(rsp) { 
+                    M.ciniki_sponsors_main.sponsors.liveSearchShow('search', null, M.gE(M.ciniki_sponsors_main.sponsors.panelUID + '_' + s), rsp.sponsors); 
+                });
             return true;
-        };
-        this.sedit.deleteImage = function(fid) {
-            this.setFieldValue(fid, 0, null, null);
-            return true;
-        };
-        this.sedit.addButton('save', 'Save', 'M.ciniki_sponsors_main.saveSponsor();');
-        this.sedit.addClose('Cancel');
+        }
+    };
+    this.sponsors.liveSearchResultValue = function(s, f, i, j, d) {
+        if( s == 'search' ) { 
+            switch(j) {
+                case 0: return d.title;
+                case 1: return (d.level_name!=null?d.level_name:'No sponsorship level');
+            }
+        }
+        return '';
+    };
+    this.sponsors.liveSearchResultRowFn = function(s, f, i, j, d) { 
+        return 'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');'; 
+    };
+    this.sponsors.sectionData = function(s) { return this.data[s]; }
+    this.sponsors.noData = function(s) { return this.sections[s].noData; }
+    this.sponsors.cellValue = function(s, i, j, d) {
+        if( s == 'levels' ) {
+            return M.textCount(d.name, d.num_sponsors);
+        } else if( s == 'categories' ) {
+            return M.textCount(d.name, d.num_sponsors);
+        } else if( s == 'sponsors' ) {
+            return d.title;
+        }
     }
+    this.sponsors.rowClass = function(s, i, d) {
+        if( s == 'levels' && this.level_id == d.id ) {
+            return 'highlight';
+        }
+        if( s == 'categories' && this.category_id == d.id ) {
+            return 'highlight';
+        }
+        return '';
+    }
+    this.sponsors.rowFn = function(s, i, d) {
+        if( s == 'levels' ) {
+            return 'M.ciniki_sponsors_main.sponsors.openLevel("' + d.id + '");';
+        }
+        if( s == 'categories' ) {
+            return 'M.ciniki_sponsors_main.sponsors.openCategory("' + d.id + '");';
+        }
+        if( s == 'sponsors' ) {
+            return 'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+        }
+    }
+    this.sponsors.openLevel = function(l) {
+        this.level_id = l;
+        this.open();
+    }
+    this.sponsors.openCategory = function(c) {
+        this.category_id = c;
+        this.open();
+    }
+    this.sponsors.open = function(cb, lid, lname) {
+        if( lid != null ) { this.level_id = lid; }
+//        if( lname != null && lname != '' ) { 
+//            this.sections.sponsors.label = unescape(lname); 
+//        }
+        // Add edit level button to top right
+//        if( this.level_id > 0 ) {
+//            this.addButton('edit', 'Edit', 'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + this.level_id + '\');');
+//        } else {
+//            if( this.rightbuttons['edit'] != null ) {
+//                delete this.rightbuttons['edit'];
+//            }
+//        }
+        var args = {'tnid':M.curTenantID};
+        if( M.modFlagOn('ciniki.sponsors', 0x01) && this.sections._tabs.selected == 'levels' ) {
+            args['level_id'] = this.level_id; 
+        }
+        if( M.modFlagOn('ciniki.sponsors', 0x04) && this.sections._tabs.selected == 'categories' ) {
+            args['category_id'] = this.category_id; 
+        }
+        M.api.getJSONCb('ciniki.sponsors.sponsorList', args, function(rsp) {
+            if( rsp.stat != 'ok' ) {
+                M.api.err(rsp);
+                return false;
+            }
+            var p = M.ciniki_sponsors_main.sponsors;
+            p.data = rsp;
+            p.refresh();
+            p.show(cb);
+        });
+    }
+    this.sponsors.addClose('Back');
+
+    //
+    // The level edit panel
+    //
+    this.level = new M.panel('Sponsorship Level',
+        'ciniki_sponsors_main', 'level',
+        'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.level');
+    this.level.data = null;
+    this.level.sponsor_id = 0;
+    this.level.sections = {
+        '_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
+            'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
+        }},
+        'general':{'label':'', 'fields':{
+            'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
+            'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
+            'size':{'label':'Size', 'type':'toggle', 'toggles':this.sizeOptions},
+            }}, 
+        '_buttons':{'label':'', 'buttons':{
+            'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.level.save();'},
+            'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.level.remove();'},
+            }},
+        };
+    this.level.fieldValue = function(s, i, d) { return this.data[i]; }
+    this.level.fieldHistoryArgs = function(s, i) {
+        return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
+            'sponsor_id':this.sponsor_id, 'field':i}};
+    }
+    this.level.open = function(cb, lid) {
+        this.reset();
+        if( lid != null ) { this.level_id = lid; }
+        if( this.level_id > 0 ) {
+            M.api.getJSONCb('ciniki.sponsors.levelGet', {'tnid':M.curTenantID, 
+                'level_id':this.level_id}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    }
+                    var p = M.ciniki_sponsors_main.level;
+                    p.data = rsp.level;
+                    p.refresh();
+                    p.show(cb);
+                });
+        } else {
+            this.data = {'size':30};
+            this.show(cb);
+        }
+    }
+    this.level.save = function() {
+        if( this.level_id > 0 ) {
+            var c = this.serializeForm('no');
+            if( c != '' ) {
+                M.api.postJSONCb('ciniki.sponsors.levelUpdate', 
+                    {'tnid':M.curTenantID, 'level_id':M.ciniki_sponsors_main.level.level_id}, c,
+                    function(rsp) {
+                        if( rsp.stat != 'ok' ) {
+                            M.api.err(rsp);
+                            return false;
+                        } 
+                    M.ciniki_sponsors_main.level.close();
+                    });
+            } else {
+                this.close();
+            }
+        } else {
+            var c = this.serializeForm('yes');
+            M.api.postJSONCb('ciniki.sponsors.levelAdd', 
+                {'tnid':M.curTenantID}, c, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    } 
+                    M.ciniki_sponsors_main.level.close();
+                });
+        }
+    }
+    this.level.remove = function() {
+        M.confirm("Are you sure you want to remove this level?",null,function() {
+            M.api.getJSONCb('ciniki.sponsors.levelDelete', 
+                {'tnid':M.curTenantID, 
+                'level_id':M.ciniki_sponsors_main.level.level_id}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    }
+                    M.ciniki_sponsors_main.level.close();
+                });
+        });
+    }
+    this.level.addClose('Cancel');
+
+    //
+    // The category edit panel
+    //
+    this.category = new M.panel('Sponsorship Category',
+        'ciniki_sponsors_main', 'category',
+        'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.category');
+    this.category.data = null;
+    this.category.sponsor_id = 0;
+    this.category.sections = {
+        'general':{'label':'', 'fields':{
+            'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
+            'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
+            }}, 
+        '_buttons':{'label':'', 'buttons':{
+            'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.category.save();'},
+            'delete':{'label':'Delete', 
+                'visible':function() { return M.ciniki_sponsors_main.category.sponsor_id > 0 ? 'yes' : 'no'; },
+                'fn':'M.ciniki_sponsors_main.category.remove();',
+                },
+            }},
+        };
+    this.category.fieldValue = function(s, i, d) { return this.data[i]; }
+    this.category.fieldHistoryArgs = function(s, i) {
+        return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
+            'sponsor_id':this.sponsor_id, 'field':i}};
+    }
+    this.category.open = function(cb, lid) {
+        this.reset();
+        if( lid != null ) { this.category_id = lid; }
+        M.api.getJSONCb('ciniki.sponsors.categoryGet', {'tnid':M.curTenantID, 
+            'category_id':this.category_id}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                var p = M.ciniki_sponsors_main.category;
+                p.data = rsp.category;
+                p.refresh();
+                p.show(cb);
+            });
+    }
+    this.category.save = function() {
+        if( this.category_id > 0 ) {
+            var c = this.serializeForm('no');
+            if( c != '' ) {
+                M.api.postJSONCb('ciniki.sponsors.categoryUpdate', 
+                    {'tnid':M.curTenantID, 'category_id':M.ciniki_sponsors_main.category.category_id}, c,
+                    function(rsp) {
+                        if( rsp.stat != 'ok' ) {
+                            M.api.err(rsp);
+                            return false;
+                        } 
+                    M.ciniki_sponsors_main.category.close();
+                    });
+            } else {
+                this.close();
+            }
+        } else {
+            var c = this.serializeForm('yes');
+            M.api.postJSONCb('ciniki.sponsors.categoryAdd', 
+                {'tnid':M.curTenantID}, c, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    } 
+                    M.ciniki_sponsors_main.category.close();
+                });
+        }
+    }
+    this.category.remove = function() {
+        M.confirm("Are you sure you want to remove this category?",null,function() {
+            M.api.getJSONCb('ciniki.sponsors.categoryDelete', 
+                {'tnid':M.curTenantID, 
+                'category_id':M.ciniki_sponsors_main.category.category_id}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    }
+                    M.ciniki_sponsors_main.category.close();
+                });
+        });
+    }
+    this.category.addClose('Cancel');
+
+    //
+    // The sponsor edit panel
+    //
+    this.sponsor = new M.panel('Sponsor',
+        'ciniki_sponsors_main', 'sponsor',
+        'mc', 'medium mediumaside', 'sectioned', 'ciniki.sponsors.main.sponsor');
+    this.sponsor.data = null;
+    this.sponsor.level_id = 0;
+    this.sponsor.sponsor_id = 0;
+    this.sponsor.sections = {
+        'general':{'label':'Sponsor', 'aside':'yes', 'fields':{
+            'title':{'label':'Name', 'hint':'Sponsor name', 'type':'text'},
+            'level_id':{'label':'Level', 'active':'no', 'type':'select', 'options':{}},
+            'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
+            'webflags':{'label':'Website', 'type':'flags', 'toggle':'no', 'join':'yes', 'flags':this.webFlags},
+            'url':{'label':'URL', 'hint':'Enter the http:// address for the sponsors website', 'type':'text'},
+            }}, 
+        '_categories':{'label':'Categories', 'aside':'yes', 
+            'visible':function() {return M.modFlagSet('ciniki.sponsors', 0x04); },
+            'fields':{
+                'categories':{'label':'', 'hidelabel':'yes', 'type':'idlist', 'list':[]},
+            }},
+        'customer_details':{'label':'Linked Customer Business Account', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
+            'cellClasses':['label', ''],
+            'noData':'No linked customer account',
+            'addTxt':'Edit Customer Account',
+            'addFn':'M.ciniki_sponsors_main.sponsor.editCustomer();',
+            'changeTxt':'Change Customer Account',
+            'changeFn':'M.ciniki_sponsors_main.sponsor.changeCustomer();',
+            },
+        'contacts':{'label':'Employees', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
+            'addTxt':'Add Employee',
+            'addFn':'M.ciniki_sponsors_main.sponsor.addContact();',
+            'editFn':function(s,i,d) {
+                if( d != null ) {
+                    return 'M.ciniki_sponsors_main.sponsor.updateContactLabel(' + i + ',\'' + escape(d.label) + '\');';
+                }
+                return '';
+                },
+            'deleteFn':function(s,i,d) {
+                if( d != null ) {
+                    return 'M.ciniki_sponsors_main.sponsor.deleteContact(' + i + ');';
+                }
+                return '';
+                },
+            },
+        '_tabs':{'label':'', 'type':'paneltabs', 'selected':'website', 
+            'visible':function() {return M.modFlagSet('ciniki.sponsors', 0x04); },
+            'tabs':{
+                'sponsorships':{'label':'Sponsorships', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("sponsorships");'},
+                'items':{'label':'Donated Items', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("items");'},
+                'website':{'label':'Website', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("website");'},
+            }},
+        'sponsorships':{'label':'Sponsorships', 'type':'simplegrid', 'num_cols':4,
+            'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'sponsorships' ? 'yes' : 'hidden'; },
+            'headerValues':['Date', 'Package', 'Attached to', 'Amount'],
+            'noData':'No sponsorships',
+            },
+        'donateditems':{'label':'Donated Items', 'type':'simplegrid', 'num_cols':5,
+            'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'items' ? 'yes' : 'hidden'; },
+            'headerValues':['Item', 'Value', 'Exhibit', 'Sold Amount', 'Date'],
+            'noData':'No donated items',
+            },
+        '_image':{'label':'Sponsor Logo', 'type':'imageform', 
+            'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'website' ? 'yes' : 'hidden'; },
+            'fields':{
+                'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
+            }},
+        '_excerpt':{'label':'Description', 
+            'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'website' ? 'yes' : 'hidden'; },
+            'fields':{
+                'excerpt':{'label':'', 'hidelabel':'yes', 'hint':'', 'type':'textarea'},
+            }},
+        '_notes':{'label':'Notes', 
+            'fields':{
+                'notes':{'label':'', 'hidelabel':'yes', 'hint':'', 'type':'textarea'},
+            }},
+        '_buttons':{'label':'', 'buttons':{
+            'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.sponsor.save();'},
+            'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.sponsor.remove();'},
+            }},
+        };
+    this.sponsor.fieldValue = function(s, i, d) { return this.data[i]; }
+    this.sponsor.fieldHistoryArgs = function(s, i) {
+        return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
+            'sponsor_id':this.sponsor_id, 'field':i}};
+    }
+    this.sponsor.addDropImage = function(iid) {
+        M.ciniki_sponsors_main.sponsor.setFieldValue('primary_image_id', iid, null, null);
+        return true;
+    };
+    this.sponsor.deleteImage = function(fid) {
+        this.setFieldValue(fid, 0, null, null);
+        return true;
+    };
+    this.sponsor.editCustomer = function() {
+        this.save("M.startApp('ciniki.customers.edit',null,'M.ciniki_sponsors_main.sponsor.open();','mc',{'next':'M.ciniki_sponsors_main.sponsor.updateCustomer', 'action':'edit', 'customer_id':M.ciniki_sponsors_main.sponsor.data.customer_id});");
+    }
+    this.sponsor.changeCustomer = function() {
+        this.save("M.startApp('ciniki.customers.edit',null,'M.ciniki_sponsors_main.sponsor.open();','mc',{'next':'M.ciniki_sponsors_main.sponsor.updateCustomer', 'action':'change', 'current_id':M.ciniki_sponsors_main.sponsor.data.customer_id,'customer_id':0});");
+    }
+    this.sponsor.updateCustomer = function(cid) {
+        M.api.getJSONCb('ciniki.sponsors.sponsorUpdate', {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id, 'customer_id':cid}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                } 
+                M.ciniki_sponsors_main.sponsor.open();
+            });
+    }
+    this.sponsor.addContact = function() {
+        this.save("M.startApp('ciniki.customers.edit',null,'M.ciniki_sponsors_main.sponsor.open();','mc',{'next':'M.ciniki_sponsors_main.sponsor.updateContact', 'action':'change', 'current_id':0,'customer_id':0});");
+    }
+    this.sponsor.deleteContact = function(i) {
+        var contact = this.data.contacts[i];
+        M.confirm("Are you sure you want to " + contact.display_name + " as an employee?",null,function() {
+            M.api.getJSONCb('ciniki.sponsors.contactDelete', {'tnid':M.curTenantID, 'contact_id':contact.id}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    } 
+                    delete(M.ciniki_sponsors_main.sponsor.data.contacts[i]);
+                    M.ciniki_sponsors_main.sponsor.refreshSection('contacts'); 
+                });
+            });
+    }
+    this.sponsor.updateContactLabel = function(i, old) {
+        var contact = this.data.contacts[i];
+        M.prompt('Employee Label:', unescape(old), 'Update', function(n) {
+            if( old != n ) {
+                M.api.getJSONCb('ciniki.sponsors.contactUpdate', {'tnid':M.curTenantID, 'contact_id':contact.id, 'label':n}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    } 
+                    M.ciniki_sponsors_main.sponsor.data.contacts[i].label = n;
+                    M.ciniki_sponsors_main.sponsor.refreshSection('contacts'); 
+                });
+            }
+            });
+    }
+    this.sponsor.updateContact = function(cid) {
+        M.api.getJSONCb('ciniki.sponsors.contactAdd', {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id, 'customer_id':cid}, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                } 
+                M.ciniki_sponsors_main.sponsor.open();
+            });
+    }
+    this.sponsor.cellValue = function(s, i, j, d) {
+        if( s == 'customer_details' ) {
+            switch(j) {
+                case 0: return d.label;
+                case 1: return d.value;
+            }
+        }
+        if( s == 'contacts' ) {
+            switch(j) {
+                case 0: return d.display_name;
+                case 1: return d.label;
+            }
+        }
+        if( s == 'sponsorships' ) {
+            switch(j) {
+                case 0: return d.invoice_date;
+                case 1: return d.name;
+                case 2: return d.attached_to;
+                case 3: return M.formatDollar(d.total_amount);
+            }
+        }
+        if( s == 'donateditems' ) {
+            switch(j) {
+                case 0: return d.name;
+                case 1: return d.value_display;
+                case 2: return d.exhibit_name;
+                case 3: return d.total_amount_display;
+                case 4: return d.sell_date_display;
+            }
+        }
+    }
+    this.sponsor.rowFn = function(s, i, d) {
+        if( s == 'contacts' ) {
+            return 'M.ciniki_sponsors_main.sponsor.save("M.startApp(\'ciniki.customers.edit\',null,\'M.ciniki_sponsors_main.sponsor.open();\',\'mc\',{\'action\':\'edit\',\'customer_id\':' + d.customer_id + '});");';
+        }
+        return '';
+    }
+    this.sponsor.switchTab = function(t) {
+        this.sections._tabs.selected = t;
+        this.refreshSections(['_tabs']);
+        this.showHideSections(['sponsorships', 'donateditems', '_image', '_excerpt']);
+    }
+    this.sponsor.open = function(cb, sid, lid) {
+        this.reset();
+        if( sid != null ) { this.sponsor_id = sid; }
+        var args = {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id};
+        if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
+            args['sponsorships'] = 'yes';
+            args['donateditems'] = 'yes';
+        }
+        M.api.getJSONCb('ciniki.sponsors.sponsorGet', args, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                var p = M.ciniki_sponsors_main.sponsor;
+                p.data = rsp.sponsor;
+                if( rsp.sponsor.customer_id > 0 ) {
+                    p.customer_id = rsp.sponsor.customer_id;
+                    p.sections.customer_details.addTxt = 'Edit Customer Account';
+                    p.sections.customer_details.changeTxt = 'Change Customer Account';
+                } else {
+                    p.customer_id = 0;
+                    p.sections.customer_details.addTxt = 'Link Customer Account';
+                    p.sections.customer_details.changeTxt = '';
+                }
+                if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
+                    p.sections.general.fields.level_id.options = {};
+                    for(i in rsp.levels) {
+                        p.sections.general.fields.level_id.options[rsp.levels[i].id] = rsp.levels[i].name;
+                    }
+                    p.sections.general.fields.level_id.active = 'yes';
+                } else {
+                    p.sections.general.fields.level_id.active = 'no';
+                }
+                p.sections._categories.fields.categories.list = rsp.categories;
+                p.refresh();
+                p.show(cb);
+                });
+    }
+    this.sponsor.save = function(cb) {
+        if( cb == null ) { cb = 'M.ciniki_sponsors_main.sponsor.close();'; }
+        if( this.sponsor_id > 0 ) {
+            var c = this.serializeForm('no');
+            if( c != '' ) {
+                M.api.postJSONCb('ciniki.sponsors.sponsorUpdate', 
+                    {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id}, c,
+                    function(rsp) {
+                        if( rsp.stat != 'ok' ) {
+                            M.api.err(rsp);
+                            return false;
+                        } 
+                        eval(cb);
+                    });
+            } else {
+                eval(cb);
+            }
+        } else {
+            var c = this.serializeForm('yes');
+            M.api.postJSONCb('ciniki.sponsors.sponsorAdd', {'tnid':M.curTenantID}, c, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                } 
+                M.ciniki_sponsors_main.sponsor.sponsor_id = rsp.id;
+                eval(cb);
+            });
+        }
+    }
+    this.sponsor.remove = function() {
+        M.confirm("Are you sure you want to remove this sponsor?",null,function() {
+            M.api.getJSONCb('ciniki.sponsors.sponsorDelete', 
+                {'tnid':M.curTenantID, 
+                'sponsor_id':M.ciniki_sponsors_main.sponsor.sponsor_id}, function(rsp) {
+                    if( rsp.stat != 'ok' ) {
+                        M.api.err(rsp);
+                        return false;
+                    }
+                    M.ciniki_sponsors_main.sponsor.close();
+                });
+        });
+    }
+    this.sponsor.addButton('save', 'Save', 'M.ciniki_sponsors_main.sponsor.save();');
+    this.sponsor.addClose('Cancel');
 
     //
     // Arguments:
@@ -180,206 +609,46 @@ function ciniki_sponsors_main() {
             return false;
         } 
 
-        if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
-            this.showLevels(cb);
+        //
+        // Initialize for tenant
+        //
+        if( this.curTenantID == null || this.curTenantID != M.curTenantID ) {
+            this.tenantInit();
+            this.curTenantID = M.curTenantID;
+        }
+
+        //
+        // Check if levels or categories are enabled
+        //
+        if( M.modFlagAny('ciniki.sponsors', 0x05) == 'yes' ) {
+            this.sponsors.size = 'full narrowaside';
+            if( M.modFlagOn('ciniki.sponsors', 0x05) ) {
+                this.sponsors.sections.levels.label = '';
+            } else if( M.modFlagOn('ciniki.sponsors', 0x01) ) {
+                this.sponsors.sections._tabs.selected = 'levels';
+                this.sponsors.sections.levels.label = 'Levels';
+            } else if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
+                this.sponsors.sections.categories.label = 'Categories';
+                this.sponsors.sections._tabs.selected = 'categories';
+            }
         } else {
-            this.showSponsors(cb, 0, 'Sponsors');
+            this.sponsors.size = 'medium';
+        }
+
+        if( args.sponsor_id != null ) {
+            this.sponsor.open(cb, args.sponsor_id);
+        } else {
+            this.sponsors.open(cb, 0, 'Sponsors');
         }
     }
 
-    //
-    // Level functions
-    //
-    this.showLevels = function(cb) {
-        M.api.getJSONCb('ciniki.sponsors.levelList', 
-            {'tnid':M.curTenantID}, function(rsp) {
-                if( rsp.stat != 'ok' ) {
-                    M.api.err(rsp);
-                    return false;
-                }
-                var p = M.ciniki_sponsors_main.levels;
-                p.data = {'levels':rsp.levels};
-                p.refresh();
-                p.show(cb);
-            });
-    };
-
-    this.showLevelEdit = function(cb, lid) {
-        this.ledit.reset();
-        if( lid != null ) { this.ledit.level_id = lid; }
-        if( this.ledit.level_id > 0 ) {
-            M.api.getJSONCb('ciniki.sponsors.levelGet', {'tnid':M.curTenantID, 
-                'level_id':this.ledit.level_id}, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    }
-                    var p = M.ciniki_sponsors_main.ledit;
-                    p.data = rsp.level;
-                    p.refresh();
-                    p.show(cb);
-                });
+    this.tenantInit = function() {
+        this.sponsors.level_id = 0;
+        this.sponsors.category_id = 0;
+        if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
+            this.sponsor.sections._tabs.selected = 'items';
         } else {
-            this.ledit.data = {'size':30};
-            this.ledit.show(cb);
+            this.sponsor.sections._tabs.selected = 'website';
         }
-    };
-
-    this.saveLevel = function() {
-        if( this.ledit.level_id > 0 ) {
-            var c = this.ledit.serializeForm('no');
-            if( c != '' ) {
-                M.api.postJSONCb('ciniki.sponsors.levelUpdate', 
-                    {'tnid':M.curTenantID, 'level_id':M.ciniki_sponsors_main.ledit.level_id}, c,
-                    function(rsp) {
-                        if( rsp.stat != 'ok' ) {
-                            M.api.err(rsp);
-                            return false;
-                        } 
-                    M.ciniki_sponsors_main.ledit.close();
-                    });
-            } else {
-                this.ledit.close();
-            }
-        } else {
-            var c = this.ledit.serializeForm('yes');
-            M.api.postJSONCb('ciniki.sponsors.levelAdd', 
-                {'tnid':M.curTenantID}, c, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    } 
-                    M.ciniki_sponsors_main.ledit.close();
-                });
-        }
-    };
-
-    this.removeLevel = function() {
-        M.confirm("Are you sure you want to remove this level?",null,function() {
-            M.api.getJSONCb('ciniki.sponsors.levelDelete', 
-                {'tnid':M.curTenantID, 
-                'level_id':M.ciniki_sponsors_main.ledit.level_id}, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    }
-                    M.ciniki_sponsors_main.ledit.close();
-                });
-        });
-    }
-
-    //
-    // Sponsor functions
-    //
-    this.showSponsors = function(cb, lid, lname) {
-        if( lid != null ) { this.sponsors.level_id = lid; }
-        if( lname != null && lname != '' ) { this.sponsors.sections.sponsors.label = unescape(lname); }
-        // Add edit level button to top right
-        if( this.sponsors.level_id > 0 ) {
-            this.sponsors.addButton('edit', 'Edit', 'M.ciniki_sponsors_main.showLevelEdit(\'M.ciniki_sponsors_main.showSponsors();\',\'' + this.sponsors.level_id + '\');');
-        } else {
-            if( this.sponsors.rightbuttons['edit'] != null ) {
-                delete this.sponsors.rightbuttons['edit'];
-            }
-        }
-        M.api.getJSONCb('ciniki.sponsors.sponsorList', 
-            {'tnid':M.curTenantID, 'level_id':this.sponsors.level_id}, function(rsp) {
-                if( rsp.stat != 'ok' ) {
-                    M.api.err(rsp);
-                    return false;
-                }
-                var p = M.ciniki_sponsors_main.sponsors;
-                p.data = {'sponsors':rsp.sponsors};
-                p.refresh();
-                p.show(cb);
-            });
-    };
-
-    this.showSponsorEdit = function(cb, sid, lid) {
-        this.sedit.reset();
-        if( sid != null ) { this.sedit.sponsor_id = sid; }
-        if( this.sedit.sponsor_id > 0 ) {
-            this.sedit.sections._buttons.buttons.delete.visible = 'yes';
-            M.api.getJSONCb('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 
-                'sponsor_id':this.sedit.sponsor_id}, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    }
-                    var p = M.ciniki_sponsors_main.sedit;
-                    p.data = rsp.sponsor;
-                    if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
-                        p.sections.general.fields.level_id.options = {};
-                        for(i in rsp.levels) {
-                            p.sections.general.fields.level_id.options[rsp.levels[i].level.id] = rsp.levels[i].level.name;
-                        }
-                        p.sections.general.fields.level_id.active = 'yes';
-                    } else {
-                        p.sections.general.fields.level_id.active = 'no';
-                    }
-                    p.refresh();
-                    p.show(cb);
-                });
-        } else {
-            this.sedit.sections._buttons.buttons.delete.visible = 'no';
-            this.sedit.data = {};
-            if( lid != null && lid != 0 ) {
-                this.sedit.data.level_id = lid;
-            }
-            if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
-                var lvls = this.levels.data.levels;
-                for(i in lvls) {
-                    this.sedit.sections.general.fields.level_id.options[lvls[i].level.id] = lvls[i].level.name;
-                }
-                this.sedit.sections.general.fields.level_id.active = 'yes';
-            } else {
-                this.sedit.sections.general.fields.level_id.active = 'no';
-            }
-            this.sedit.refresh();
-            this.sedit.show(cb);
-        }
-    };
-
-    this.saveSponsor = function() {
-        if( this.sedit.sponsor_id > 0 ) {
-            var c = this.sedit.serializeForm('no');
-            if( c != '' ) {
-                M.api.postJSONCb('ciniki.sponsors.sponsorUpdate', 
-                    {'tnid':M.curTenantID, 'sponsor_id':this.sedit.sponsor_id}, c,
-                    function(rsp) {
-                        if( rsp.stat != 'ok' ) {
-                            M.api.err(rsp);
-                            return false;
-                        } 
-                    M.ciniki_sponsors_main.sedit.close();
-                    });
-            } else {
-                this.sedit.close();
-            }
-        } else {
-            var c = this.sedit.serializeForm('yes');
-            M.api.postJSONCb('ciniki.sponsors.sponsorAdd', 
-                {'tnid':M.curTenantID}, c, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    } 
-                    M.ciniki_sponsors_main.sedit.close();
-                });
-        }
-    };
-
-    this.removeSponsor = function() {
-        M.confirm("Are you sure you want to remove this sponsor?",null,function() {
-            M.api.getJSONCb('ciniki.sponsors.sponsorDelete', 
-                {'tnid':M.curTenantID, 
-                'sponsor_id':M.ciniki_sponsors_main.sedit.sponsor_id}, function(rsp) {
-                    if( rsp.stat != 'ok' ) {
-                        M.api.err(rsp);
-                        return false;
-                    }
-                    M.ciniki_sponsors_main.sedit.close();
-                });
-        });
     }
 };

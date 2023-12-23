@@ -56,6 +56,35 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
     $sponsor_uuid = $rc['sponsor']['uuid'];
 
     //
+    // Get the list of categories
+    //
+    $strsql = "SELECT id, uuid "
+        . "FROM ciniki_sponsors_categories "
+        . "WHERE sponsor_id = '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'item');
+    if( $rc['stat'] != 'ok' ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.46', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
+    }
+    $categories = isset($rc['rows']) ? $rc['rows'] : array();
+
+    //
+    // Get the list of contacts
+    //
+    $strsql = "SELECT id, uuid "
+        . "FROM ciniki_sponsor_contacts "
+        . "WHERE sponsor_id = '" . ciniki_core_dbQuote($ciniki, $args['sponsor_id']) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'item');
+    if( $rc['stat'] != 'ok' ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.46', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
+    }
+    $contacts = isset($rc['rows']) ? $rc['rows'] : array();
+    
+
+    //
     // Check if there are any objects still referencing this sponsor
     //
 /*    $strsql = "SELECT 'refs', COUNT(*) "
@@ -105,6 +134,17 @@ function ciniki_sponsors_sponsorDelete(&$ciniki) {
                 ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
                 return $rc;
             }
+        }
+    }
+
+    //
+    // Remove from categories
+    //
+    foreach($categories as $cat) {
+        $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.sponsors.categorysponsor', $cat['id'], $cat['uuid'], 0x04);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
+            return $rc;
         }
     }
 

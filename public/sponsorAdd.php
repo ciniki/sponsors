@@ -38,6 +38,7 @@ function ciniki_sponsors_sponsorAdd(&$ciniki) {
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'title'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Title'), 
         'permalink'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Permalink'), 
+        'customer_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Customer'), 
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'level'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'default'=>'1', 'name'=>'Sequence'), 
@@ -47,6 +48,7 @@ function ciniki_sponsors_sponsorAdd(&$ciniki) {
         'excerpt'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Description'), 
         'content'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Content'), 
         'notes'=>array('required'=>'no', 'default'=>'', 'blank'=>'yes', 'name'=>'Notes'), 
+        'categories'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'name'=>'Categories'), 
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -156,6 +158,18 @@ function ciniki_sponsors_sponsorAdd(&$ciniki) {
         return $rc;
     }
     $sponsor_id = $rc['id'];
+
+    //
+    // Update the sponsor
+    //
+    if( isset($args['categories']) ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'private', 'sponsorCategoriesUpdate');
+        $rc = ciniki_sponsors_sponsorCategoriesUpdate($ciniki, $args['tnid'], $sponsor_id, $args['categories']);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
+            return $rc;
+        }
+    }
 
     //
     // Commit the transaction

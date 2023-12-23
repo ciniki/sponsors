@@ -38,9 +38,12 @@ function ciniki_sponsors_hooks_objectSponsorships($ciniki, $tnid, $args) {
         // Get the list of sponsorships via packages
         //
         $strsql = "SELECT items.id, "
+            . "invoices.id AS invoice_id, "
             . "invoices.invoice_date, "
             . "customers.display_name, "
-            . "items.total_amount "
+            . "IFNULL(sponsors.title, customers.display_name) AS sponsor_name, "
+            . "IFNULL(sponsors.id, 0) AS sponsor_id, "
+            . "items.total_amount " 
             . "FROM ciniki_sponsor_packages AS packages "
             . "INNER JOIN ciniki_sapos_invoice_items AS items ON ("
                 . "packages.id = items.object_id "
@@ -51,9 +54,13 @@ function ciniki_sponsors_hooks_objectSponsorships($ciniki, $tnid, $args) {
                 . "items.invoice_id = invoices.id "
                 . "AND invoices.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                 . ") "
-            . "LEFT JOIn ciniki_customers AS customers ON ("
+            . "LEFT JOIN ciniki_customers AS customers ON ("
                 . "invoices.customer_id = customers.id "
                 . "AND customers.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
+                . ") "
+            . "LEFT JOIN ciniki_sponsors AS sponsors ON ("
+                . "customers.id = sponsors.customer_id "
+                . "AND sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
                 . ") "
             . "WHERE packages.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "AND packages.object = '" . ciniki_core_dbQuote($ciniki, $args['object']) . "' "
@@ -62,7 +69,7 @@ function ciniki_sponsors_hooks_objectSponsorships($ciniki, $tnid, $args) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
             array('container'=>'sponsorships', 'fname'=>'id', 
-                'fields'=>array('id', 'invoice_date', 'display_name', 'total_amount'),
+                'fields'=>array('id', 'invoice_id', 'invoice_date', 'display_name', 'sponsor_id', 'sponsor_name', 'total_amount'),
                 'utctotz'=>array('invoice_date'=>array('timezone'=>'UTC', 'format'=>$date_format)),
                 ),
             ));

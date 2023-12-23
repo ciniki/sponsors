@@ -1,0 +1,36 @@
+#
+# Description
+# -----------
+# This table stores the links to the contact who are people working for the sponsor.
+#
+# Fields
+# ------
+# id:               The ID assigned to the contact.
+# uuid:             The Universal Unique ID.
+# tnid:             The tenant the sponsor is attached to.
+# 
+# sponsor_id:       The ID of the sponsor the customer is connected to.
+#
+# customer_id:      The ID of the customer record this sponsor attached to.
+#                   The customer should be a "business" with the business name of the sponsor.
+#
+# label:            The label of the customer in the sponsor.
+# sequence:         The order to display this contact.
+#
+# date_added:       The UTC date and time the record was added.
+# last_updated:     The UTC date and time the record was last updated.
+#
+create table ciniki_sponsor_contacts (
+    id int not null auto_increment,
+    uuid char(36) not null,
+    tnid int not null,
+    sponsor_id int not null,
+    customer_id int not null,
+    label varchar(50) not null,
+    sequence varchar(50) not null,
+    date_added datetime not null,
+    last_updated datetime not null,
+    primary key (id),
+    index (sponsor_id, customer_id),
+    index sync (tnid, uuid, last_updated)
+) ENGINE='InnoDB', COMMENT='v1.01';

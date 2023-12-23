@@ -29,6 +29,7 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
         'sponsor_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor'), 
         'title'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Title'), 
         'permalink'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Permalink'), 
+        'customer_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Customer'), 
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'level'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Sequence'), 
@@ -38,6 +39,7 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
         'excerpt'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Description'), 
         'content'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Content'), 
         'notes'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Notes'), 
+        'categories'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'idlist', 'name'=>'Categories'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
