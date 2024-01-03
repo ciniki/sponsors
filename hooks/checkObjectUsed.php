@@ -40,7 +40,7 @@ function ciniki_sponsors_hooks_checkObjectUsed($ciniki, $tnid, $args) {
         // Check the contact
         //
         $strsql = "SELECT 'items', COUNT(*) "
-            . "FROM ciniki_sponsors_contacts "
+            . "FROM ciniki_sponsor_contacts "
             . "WHERE customer_id = '" . ciniki_core_dbQuote($ciniki, $args['object_id']) . "' "
             . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
             . "";
