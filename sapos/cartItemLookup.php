@@ -35,6 +35,7 @@ function ciniki_sponsors_sapos_cartItemLookup($ciniki, $tnid, $customer, $args) 
             . "packages.invoice_name, "
             . "packages.flags, "
             . "packages.category, "
+            . "packages.subcategory, "
             . "packages.sequence, "
             . "packages.amount, "
             . "packages.primary_image_id, "

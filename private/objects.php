@@ -113,6 +113,7 @@ function ciniki_sponsors_objects($ciniki) {
             'object' => array('name'=>'Object', 'default'=>''),
             'object_id' => array('name'=>'Object ID', 'default'=>''),
             'category' => array('name'=>'Accounting Category', 'default'=>''),
+            'subcategory' => array('name'=>'Accounting Subcategory', 'default'=>''),
             'sequence' => array('name'=>'Order', 'default'=>''),
             'amount' => array('name'=>'Amount', 'default'=>''),
             'primary_image_id' => array('name'=>'Image', 'default'=>'0', 'ref'=>'ciniki.images.image'),

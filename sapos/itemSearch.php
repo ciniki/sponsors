@@ -31,6 +31,7 @@ function ciniki_sponsors_sapos_itemSearch($ciniki, $tnid, $args) {
         . "packages.invoice_name, "
         . "packages.flags, "
         . "packages.category, "
+        . "packages.subcategory, "
         . "packages.object, "
         . "packages.object_id, "
         . "packages.amount "
@@ -49,7 +50,9 @@ function ciniki_sponsors_sapos_itemSearch($ciniki, $tnid, $args) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
     $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.sponsors', array(
         array('container'=>'packages', 'fname'=>'id', 
-            'fields'=>array('id', 'name', 'invoice_code', 'invoice_name', 'flags', 'category', 'object', 'object_id', 'amount')),
+            'fields'=>array('id', 'name', 'invoice_code', 'invoice_name', 'flags', 
+                'category', 'subcategory', 'object', 'object_id', 'amount',
+                )),
         ));
     if( $rc['stat'] != 'ok' ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.29', 'msg'=>'Unable to load packages', 'err'=>$rc['err']));
@@ -61,6 +64,7 @@ function ciniki_sponsors_sapos_itemSearch($ciniki, $tnid, $args) {
         $items[] = array('item'=>array(
             'status'=>0,
             'category' => $package['category'],
+            'subcategory' => $package['subcategory'],
             'code' => $package['invoice_code'],
             'description' => ($package['invoice_name'] != '' ? $package['invoice_name'] : $package['name']),
             'object'=>'ciniki.sponsors.package',

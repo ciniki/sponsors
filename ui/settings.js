@@ -99,6 +99,7 @@ function ciniki_sponsors_settings() {
 //            'object_id':{'label':'', 'type':'text'},
             'attached_to':{'label':'Attached To', 'type':'select', 'options':{}, 'complex_options':{'value':'id', 'name':'full_name'}},
             'category':{'label':'Accounting Category', 'type':'text'},
+            'subcategory':{'label':'Accounting Subcategory', 'type':'text'},
             'sequence':{'label':'Order', 'type':'text', 'size':'small'},
             'flags1':{'label':'Visible', 'type':'flagtoggle', 'field':'flags', 'bit':0x01, 'default':'off'},
             'flags2':{'label':'Fixed Amount', 'type':'flagtoggle', 'field':'flags', 'bit':0x02, 'default':'on', 

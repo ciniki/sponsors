@@ -21,7 +21,7 @@ function ciniki_sponsors_sapos_objectList($ciniki, $tnid) {
 //            'name' => 'All Events Sponsorship',
 //            ),
         'ciniki.sponsors.package' => array(
-            'name' => 'Event Sponsorship',
+            'name' => 'Sponsorship Package',
             ),
 //        'ciniki.sponsors.package.ciniki.courses' => array(
 //            'name' => 'All Programs Sponsorship',

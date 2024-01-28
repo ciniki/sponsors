@@ -70,6 +70,7 @@ function ciniki_sponsors_packageGet($ciniki) {
             'object'=>isset($args['object']) ? $args['object'] : '',
             'object_id'=>isset($args['object_id']) ? $args['object_id'] : '',
             'category'=>'',
+            'subcategory'=>'',
             'sequence'=>'',
             'amount'=>'',
             'primary_image_id'=>'0',
@@ -92,6 +93,7 @@ function ciniki_sponsors_packageGet($ciniki) {
             . "ciniki_sponsor_packages.object, "
             . "ciniki_sponsor_packages.object_id, "
             . "ciniki_sponsor_packages.category, "
+            . "ciniki_sponsor_packages.subcategory, "
             . "ciniki_sponsor_packages.sequence, "
             . "ciniki_sponsor_packages.amount, "
             . "ciniki_sponsor_packages.primary_image_id, "
@@ -104,8 +106,9 @@ function ciniki_sponsors_packageGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
             array('container'=>'packages', 'fname'=>'id', 
-                'fields'=>array('name', 'subname', 'permalink', 'invoice_code', 'invoice_name', 'flags', 'object', 'object_id', 'category', 'sequence', 'amount', 'primary_image_id', 'synopsis', 'description'),
-                ),
+                'fields'=>array('name', 'subname', 'permalink', 'invoice_code', 'invoice_name', 'flags', 'object', 'object_id', 
+                    'category', 'subcategory', 'sequence', 'amount', 'primary_image_id', 'synopsis', 'description',
+                    )),
             ));
         if( $rc['stat'] != 'ok' ) {
             return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.27', 'msg'=>'Sponsor Package not found', 'err'=>$rc['err']));

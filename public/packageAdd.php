@@ -30,6 +30,7 @@ function ciniki_sponsors_packageAdd(&$ciniki) {
         'object_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object ID'),
         'attached_to'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Attached To Object'),
         'category'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Accounting Category'),
+        'subcategory'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Accounting Subcategory'),
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Order'),
         'amount'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Amount'),
         'primary_image_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Image'),

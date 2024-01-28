@@ -1,0 +1,2 @@
+ALTER TABLE ciniki_sponsor_packages ADD COLUMN subcategory varchar(150) not null AFTER category;
+ALTER TABLE ciniki_sponsor_packages COMMENT='v1.02';

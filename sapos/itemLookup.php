@@ -30,6 +30,7 @@ function ciniki_sponsors_sapos_itemLookup($ciniki, $tnid, $args) {
             . "packages.invoice_name, "
             . "packages.flags, "
             . "packages.category, "
+            . "packages.subcategory, "
             . "packages.object, "
             . "packages.object_id, "
             . "packages.amount "
@@ -49,6 +50,7 @@ function ciniki_sponsors_sapos_itemLookup($ciniki, $tnid, $args) {
         $item = array(
             'status'=>0,
             'category' => $package['category'],
+            'subcategory' => $package['subcategory'],
             'code' => $package['invoice_code'],
             'description' => ($package['invoice_name'] != '' ? $package['invoice_name'] : $package['name']),
             'object'=>'ciniki.sponsors.package',
