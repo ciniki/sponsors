@@ -33,6 +33,21 @@ function ciniki_sponsors_main() {
             'editFn':function(s, i, d) {
                 return 'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
             },
+            'seqDrop':function(e,from,to) {
+                M.api.getJSONCb('ciniki.sponsors.categoryUpdate', {'tnid':M.curTenantID, 
+                    'category_id':M.ciniki_sponsors_main.sponsors.data.categories[from].id, 
+                    'sequence':M.ciniki_sponsors_main.sponsors.data.categories[to].sequence, 
+                    'categories':'yes',
+                    }, function(rsp) {
+                        if( rsp.stat != 'ok' ) {
+                            M.api.err(rsp);
+                            return false;
+                        }
+                        var p = M.ciniki_sponsors_main.sponsors;
+                        p.data.categories = rsp.categories;
+                        p.refreshSection("categories");
+                    });
+                },
             'addTxt':'Add Category',
             'addFn':'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
             },
@@ -43,10 +58,10 @@ function ciniki_sponsors_main() {
             },
         'sponsors':{'label':'Sponsors', 'type':'simplegrid', 'num_cols':1,
             'headerValues':null,
-            'cellClasses':[''],
+            'cellClasses':['multiline'],
             'noData':'No sponsors',
             'addTxt':'Add Sponsor',
-            'addFn':'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
+            'addTopFn':'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
             },
         };
     this.sponsors.liveSearchCb = function(s, i, value) {
@@ -78,8 +93,25 @@ function ciniki_sponsors_main() {
         } else if( s == 'categories' ) {
             return M.textCount(d.name, d.num_sponsors);
         } else if( s == 'sponsors' ) {
-            return d.title;
+            switch(j) {
+                case 0: return M.multiline(d.title, d.summary);
+                case 1: return d.sponsorship_amount;
+                case 2: return d.inkind_value;
+                case 3: return d.inkind_amount;
+            }
         }
+    }
+    this.sponsors.footerValue = function(s, i, sc) {
+        if( s == 'sponsors' && M.modFlagOn('ciniki.sponsors', 0x04) ) {
+            switch(i) {
+                case 0: return 'Totals';
+                case 1: return this.data.totals.sponsorship_amount;
+                case 2: return this.data.totals.inkind_value;
+                case 3: return this.data.totals.inkind_amount;
+            }
+            return '';
+        }
+        return null;
     }
     this.sponsors.rowClass = function(s, i, d) {
         if( s == 'levels' && this.level_id == d.id ) {
@@ -129,16 +161,29 @@ function ciniki_sponsors_main() {
         if( M.modFlagOn('ciniki.sponsors', 0x04) && this.sections._tabs.selected == 'categories' ) {
             args['category_id'] = this.category_id; 
         }
-        M.api.getJSONCb('ciniki.sponsors.sponsorList', args, function(rsp) {
-            if( rsp.stat != 'ok' ) {
-                M.api.err(rsp);
-                return false;
-            }
-            var p = M.ciniki_sponsors_main.sponsors;
-            p.data = rsp;
-            p.refresh();
-            p.show(cb);
-        });
+        if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
+            M.api.getJSONCb('ciniki.sponsors.sponsors', args, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                var p = M.ciniki_sponsors_main.sponsors;
+                p.data = rsp;
+                p.refresh();
+                p.show(cb);
+            });
+        } else {
+            M.api.getJSONCb('ciniki.sponsors.sponsorList', args, function(rsp) {
+                if( rsp.stat != 'ok' ) {
+                    M.api.err(rsp);
+                    return false;
+                }
+                var p = M.ciniki_sponsors_main.sponsors;
+                p.data = rsp;
+                p.refresh();
+                p.show(cb);
+            });
+        }
     }
     this.sponsors.addClose('Back');
 
@@ -244,6 +289,8 @@ function ciniki_sponsors_main() {
         'general':{'label':'', 'fields':{
             'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
             'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
+            'start_dt':{'label':'Start Date', 'type':'datetime'},
+            'end_dt':{'label':'End Date', 'type':'datetime'},
             }}, 
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.category.save();'},
@@ -337,6 +384,7 @@ function ciniki_sponsors_main() {
             'visible':function() {return M.modFlagSet('ciniki.sponsors', 0x04); },
             'fields':{
                 'categories':{'label':'', 'hidelabel':'yes', 'type':'idlist', 'list':[]},
+                'summary':{'label':'', 'hidelabel':'yes', 'hint':'short admin notes', 'type':'text'},
             }},
         'customer_details':{'label':'Linked Customer Business Account', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
             'cellClasses':['label', ''],
@@ -647,8 +695,19 @@ function ciniki_sponsors_main() {
         this.sponsors.category_id = 0;
         if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
             this.sponsor.sections._tabs.selected = 'items';
+            this.sponsors.sections.sponsors.num_cols = 4;
+            this.sponsors.sections.sponsors.headerValues = ['Sponsor', 'Sponsorships', 'In Kind Value', 'Sold For'];
+            this.sponsors.sections.sponsors.headerClasses = ['', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.cellClasses = ['multiline', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.footerClasses = ['', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.sortable = 'yes';
+            this.sponsors.sections.sponsors.sortTypes = ['text', 'number', 'number', 'number'];
         } else {
             this.sponsor.sections._tabs.selected = 'website';
+            this.sponsors.sections.sponsors.num_cols = 1;
+            this.sponsors.sections.sponsors.headerValues = [''];
+            this.sponsors.sections.sponsors.cellClasses = ['multiline'];
+            this.sponsors.sections.sponsors.footerValues = [''];
         }
     }
 };

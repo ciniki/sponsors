@@ -33,6 +33,7 @@ function ciniki_sponsors_sponsorUpdate(&$ciniki) {
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'level'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Sequence'), 
+        'summary'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Summary'), 
         'webflags'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Options'), 
         'url'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'URL'), 
         'primary_image_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Image'), 

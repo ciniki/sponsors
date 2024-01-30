@@ -56,6 +56,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             'level_id' => 0,
             'customer_id' => 0,
             'sequence' => 1,
+            'summary' => '',
             'webflags' => 0,
             'url' => '',
             'primary_image_id' => 0,
@@ -70,6 +71,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             . "ciniki_sponsors.level_id, "
             . "ciniki_sponsors.customer_id, "
             . "ciniki_sponsors.sequence, "
+            . "ciniki_sponsors.summary, "
             . "ciniki_sponsors.webflags, "
             . "ciniki_sponsors.url, "
             . "ciniki_sponsors.primary_image_id, "
@@ -88,7 +90,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(
             array('container'=>'sponsors', 'fname'=>'id', 'name'=>'sponsor',
                 'fields'=>array('id', 'title', 'permalink', 'level_id', 'customer_id',
-                    'sequence', 'webflags', 'url', 'primary_image_id', 
+                    'sequence', 'summary', 'webflags', 'url', 'primary_image_id', 
                     'excerpt', 'content', 'notes')),
         ));
         if( $rc['stat'] != 'ok' ) {

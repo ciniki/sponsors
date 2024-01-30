@@ -1,0 +1,2 @@
+ALTER TABLE ciniki_sponsors ADD COLUMN summary varchar(250) not null AFTER sequence;
+ALTER TABLE ciniki_sponsors COMMENT='v1.03';

@@ -1,0 +1,3 @@
+ALTER TABLE ciniki_sponsor_categories ADD COLUMN start_dt datetime not null AFTER sequence;
+ALTER TABLE ciniki_sponsor_categories ADD COLUMN end_dt datetime not null AFTER start_dt;
+ALTER TABLE ciniki_sponsor_categories COMMENT='v1.02';

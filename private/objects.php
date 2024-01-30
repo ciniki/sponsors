@@ -23,7 +23,8 @@ function ciniki_sponsors_objects($ciniki) {
             'permalink'=>array(),
             'customer_id'=>array('ref'=>'ciniki.customers.customer', 'default'=>'0'),
             'level_id'=>array('ref'=>'ciniki.sponsors.level'),
-            'sequence'=>array(),
+            'sequence'=>array(), 
+            'summary'=>array('name'=>'Summary', 'default'=>''),
             'webflags'=>array(),
             'url'=>array(),
             'primary_image_id'=>array('ref'=>'ciniki.images.image'),
@@ -56,6 +57,8 @@ function ciniki_sponsors_objects($ciniki) {
         'fields'=>array(
             'name'=>array('name'=>'Name'),
             'sequence'=>array('name'=>'Order', 'default'=>'1'),
+            'start_dt'=>array('name'=>'Start Date', 'default'=>''),
+            'end_dt'=>array('name'=>'End Date', 'default'=>''),
             ),
         'history_table'=>'ciniki_sponsor_history',
         );

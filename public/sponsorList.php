@@ -132,67 +132,6 @@ function ciniki_sponsors_sponsorList($ciniki) {
         }
     }
 
-    //
-    // Get the list of categories
-    //
-    if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x04) ) {
-        $strsql = "SELECT categories.id, "
-            . "categories.name, "
-            . "categories.sequence, "
-            . "COUNT(sponsors.id) AS num_sponsors "
-            . "FROM ciniki_sponsor_categories AS categories "
-            . "LEFT JOIN ciniki_sponsors_categories AS scats ON ("
-                . "categories.id = scats.category_id "
-                . "AND scats.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-                . ") "
-            . "LEFT JOIN ciniki_sponsors AS sponsors ON ("
-                . "scats.sponsor_id = sponsors.id "
-                . "AND sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-                . ")" 
-            . "WHERE categories.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-            . "GROUP BY categories.id "
-            . "ORDER BY categories.sequence "
-            . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
-        $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
-            array('container'=>'categories', 'fname'=>'id', 'name'=>'level',
-                'fields'=>array('id', 'name', 'sequence', 'num_sponsors')),
-            ));
-        if( $rc['stat'] != 'ok' ) {
-            return $rc;
-        }
-        $rsp['categories'] = isset($rc['categories']) ? $rc['categories'] : array();
-
-        //
-        // Check for sponsors with no sponsorship level
-        //
-        $strsql = "SELECT 'sponsors', "
-            . "COUNT(sponsors.id) AS num_sponsors, "
-            . "IFNULL(scats.sponsor_id, '') AS sid "    
-            . "FROM ciniki_sponsors AS sponsors "
-            . "LEFT JOIN ciniki_sponsors_categories AS scats ON ("
-                . "sponsors.id = scats.sponsor_id "
-                . "AND scats.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-                . ") "
-            . "WHERE sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-            . "GROUP BY sid "
-            . "HAVING sid = '' "
-            . "";
-        ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbCount');
-        $rc = ciniki_core_dbCount($ciniki, $strsql, 'ciniki.sponsors', 'num');
-        if( $rc['stat'] != 'ok' ) {
-            return $rc;
-        }
-        if( isset($rc['num']['sponsors']) && $rc['num']['sponsors'] > 0 ) {
-            $rsp['categories'][] = array(
-                'id'=>'0', 
-                'name'=>'No Category', 
-                'sequence'=>'0', 
-                'num_sponsors'=>$rc['num']['sponsors']
-                );
-        }
-    }
-
     return $rsp;
 }
 ?>

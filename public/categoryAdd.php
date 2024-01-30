@@ -22,6 +22,8 @@ function ciniki_sponsors_categoryAdd(&$ciniki) {
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'),
         'name'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Name'),
         'sequence'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Order'),
+        'start_dt'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetimetoutz', 'name'=>'Start Date'),
+        'end_dt'=>array('required'=>'no', 'blank'=>'yes', 'type'=>'datetimetoutz', 'name'=>'End Date'),
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;

@@ -22,9 +22,11 @@ create table ciniki_sponsor_categories (
     tnid int not null,
     name varchar(150) not null,
     sequence tinyint unsigned not null,
+    start_dt datetime not null,
+    end_dt datetime not null,
     date_added datetime not null,
     last_updated datetime not null,
     primary key (id),
     unique index (uuid),
     index sync (tnid, uuid, last_updated)
-) ENGINE='InnoDB', COMMENT='v1.01';
+) ENGINE='InnoDB', COMMENT='v1.02';

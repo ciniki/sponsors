@@ -47,11 +47,12 @@ function ciniki_sponsors_categoryGet($ciniki) {
         return $rc;
     }
     $intl_timezone = $rc['settings']['intl-default-timezone'];
-    $intl_currency_fmt = numfmt_create($rc['settings']['intl-default-locale'], NumberFormatter::CURRENCY);
-    $intl_currency = $rc['settings']['intl-default-currency'];
 
     ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'dateFormat');
     $date_format = ciniki_users_dateFormat($ciniki, 'php');
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'users', 'private', 'datetimeFormat');
+    $datetime_format = ciniki_users_datetimeFormat($ciniki, 'php');
+    
 
     //
     // Return default for new Sponsor Categories
@@ -69,7 +70,9 @@ function ciniki_sponsors_categoryGet($ciniki) {
     else {
         $strsql = "SELECT ciniki_sponsor_categories.id, "
             . "ciniki_sponsor_categories.name, "
-            . "ciniki_sponsor_categories.sequence "
+            . "ciniki_sponsor_categories.sequence, "
+            . "ciniki_sponsor_categories.start_dt, "
+            . "ciniki_sponsor_categories.end_dt "
             . "FROM ciniki_sponsor_categories "
             . "WHERE ciniki_sponsor_categories.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "AND ciniki_sponsor_categories.id = '" . ciniki_core_dbQuote($ciniki, $args['category_id']) . "' "
@@ -77,7 +80,11 @@ function ciniki_sponsors_categoryGet($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
             array('container'=>'categories', 'fname'=>'id', 
-                'fields'=>array('name', 'sequence'),
+                'fields'=>array('name', 'sequence', 'start_dt', 'end_dt'),
+                'utctotz'=>array(
+                    'start_dt'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
+                    'end_dt'=>array('timezone'=>$intl_timezone, 'format'=>$datetime_format),
+                    ),
                 ),
             ));
         if( $rc['stat'] != 'ok' ) {
