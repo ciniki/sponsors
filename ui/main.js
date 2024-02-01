@@ -414,7 +414,7 @@ function ciniki_sponsors_main() {
             'visible':function() {return M.modFlagSet('ciniki.sponsors', 0x04); },
             'tabs':{
                 'sponsorships':{'label':'Sponsorships', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("sponsorships");'},
-                'items':{'label':'Donated Items', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("items");'},
+                'items':{'label':'In Kind', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("items");'},
                 'website':{'label':'Website', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("website");'},
             }},
         'sponsorships':{'label':'Sponsorships', 'type':'simplegrid', 'num_cols':4,

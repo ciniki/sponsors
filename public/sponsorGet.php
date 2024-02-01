@@ -121,6 +121,8 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             $rc = ciniki_customers_hooks_customerDetails2($ciniki, $args['tnid'], array(
                 'customer_id' => $sponsor['customer_id'],
                 'membership' => 'yes',
+                'phones' => 'yes',
+                'addresses' => 'yes',
                 ));
             $sponsor['customer_details'] = isset($rc['details']) ? $rc['details'] : array();
         }
