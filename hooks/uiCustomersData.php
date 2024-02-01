@@ -131,6 +131,7 @@ function ciniki_sponsors_hooks_uiCustomersData($ciniki, $tnid, $args) {
     $tab = array(
         'id' => 'ciniki.sponsors.sponsorships',
         'label' => 'Sponsorships',
+        'priority' => 1500,
         'sections' => $sections,
         );
 
