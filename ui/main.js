@@ -387,6 +387,7 @@ function ciniki_sponsors_main() {
                 'summary':{'label':'', 'hidelabel':'yes', 'hint':'short admin notes', 'type':'text'},
             }},
         'customer_details':{'label':'Linked Customer Business Account', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
+            'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x04); },
             'cellClasses':['label', ''],
             'noData':'No linked customer account',
             'addTxt':'Edit Customer Account',
@@ -395,6 +396,7 @@ function ciniki_sponsors_main() {
             'changeFn':'M.ciniki_sponsors_main.sponsor.changeCustomer();',
             },
         'contacts':{'label':'Employees', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
+            'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x04); },
             'addTxt':'Add Employee',
             'addFn':'M.ciniki_sponsors_main.sponsor.addContact();',
             'editFn':function(s,i,d) {
@@ -443,6 +445,9 @@ function ciniki_sponsors_main() {
             }},
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.sponsor.save();'},
+            'pdf':{'label':'Sponsor PDF', 'fn':'M.ciniki_sponsors_main.sponsor.downloadPDF();',
+                'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x04) && M.ciniki_sponsors_main.sponsor.sponsor_id > 0 ? 'yes' : 'no'; },
+                },
             'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.sponsor.remove();'},
             }},
         };
@@ -555,6 +560,9 @@ function ciniki_sponsors_main() {
         this.sections._tabs.selected = t;
         this.refreshSections(['_tabs']);
         this.showHideSections(['sponsorships', 'donateditems', '_image', '_excerpt']);
+    }
+    this.sponsor.downloadPDF = function() {
+        M.api.openFile('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id, 'output':'pdf', 'sponsorships':'yes', 'donateditems':'yes'});
     }
     this.sponsor.open = function(cb, sid, lid) {
         this.reset();
@@ -705,7 +713,7 @@ function ciniki_sponsors_main() {
         } else {
             this.sponsor.sections._tabs.selected = 'website';
             this.sponsors.sections.sponsors.num_cols = 1;
-            this.sponsors.sections.sponsors.headerValues = [''];
+            this.sponsors.sections.sponsors.headerValues = [];
             this.sponsors.sections.sponsors.cellClasses = ['multiline'];
             this.sponsors.sections.sponsors.footerValues = [''];
         }

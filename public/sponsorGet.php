@@ -24,6 +24,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         'sponsor_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor'), 
         'sponsorships'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Sponsorships'), 
         'donateditems'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Donated Items'), 
+        'output'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Output'), 
         )); 
     if( $rc['stat'] != 'ok' ) { 
         return $rc;
@@ -123,6 +124,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
                 'membership' => 'yes',
                 'phones' => 'yes',
                 'addresses' => 'yes',
+                'companydetails' => 'yes', 
                 ));
             $sponsor['customer_details'] = isset($rc['details']) ? $rc['details'] : array();
         }
@@ -195,6 +197,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             $sponsor['sponsorships'] = isset($rc['sponsorships']) ? $rc['sponsorships'] : array();
 
             foreach($sponsor['sponsorships'] as $sid => $sponsorship) {
+                $sponsor['sponsorships'][$sid]['total_amount_display'] = '$' . number_format($sponsorship['total_amount'], 2);
                 if( $sponsorship['object'] != '' ) {
                     list($pkg, $mod, $obj) = explode('.', $sponsorship['object']);
                     $rc = ciniki_core_loadMethod($ciniki, $pkg, $mod, 'hooks', 'sponsorshipObjects');
@@ -271,6 +274,24 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             return $rc;
         }
         $rsp['categories'] = isset($rc['categories']) ? $rc['categories'] : array();
+    }
+    
+    //
+    // Check if PDF output
+    //
+    if( isset($args['output']) && $args['output'] == 'pdf' ) {
+        ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'templates', 'sponsorsPDF');
+        $rc = ciniki_sponsors_templates_sponsorsPDF($ciniki, $args['tnid'], array(
+            'title' => '',
+            'sponsors' => array($rsp['sponsor']),
+            ));
+        if( $rc['stat'] != 'ok' ) {
+            return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.71', 'msg'=>'Unable to generate PDF', 'err'=>$rc['err']));
+        }
+        if( isset($rc['pdf']) ) {
+            $rc['pdf']->Output($rc['filename'] . '.pdf', 'I');
+            return array('stat'=>'exit');
+        }
     }
 
     return $rsp;
