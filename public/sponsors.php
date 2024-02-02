@@ -196,11 +196,11 @@ function ciniki_sponsors_sponsors($ciniki) {
                     $sponsors[$sid]['sponsorship_amount'] = '$' . number_format($sponsorships[$sponsor['customer_id']]['total_amount'], 0);
                     $totals['sponsorship_amount'] += $sponsorships[$sponsor['customer_id']]['total_amount'];
                 }
-                if( isset($inkind[$sponsor['customer_id']]) ) {
+                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['value'] > 0 ) {
                     $sponsors[$sid]['inkind_value'] = '$' . number_format($inkind[$sponsor['customer_id']]['value'], 0);
                     $totals['inkind_value'] += $inkind[$sponsor['customer_id']]['value'];
                 }
-                if( isset($inkind[$sponsor['customer_id']]) ) {
+                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['tenant_amount'] > 0 ) {
                     $sponsors[$sid]['inkind_amount'] = '$' . number_format($inkind[$sponsor['customer_id']]['tenant_amount'], 0);
                     $totals['inkind_amount'] += $inkind[$sponsor['customer_id']]['tenant_amount'];
                 }
