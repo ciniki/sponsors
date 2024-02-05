@@ -22,6 +22,7 @@ function ciniki_sponsors_sponsors($ciniki) {
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 
         'category_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Category'), 
+        'output'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Output'), 
         ));
     if( $rc['stat'] != 'ok' ) {
         return $rc;
@@ -63,7 +64,8 @@ function ciniki_sponsors_sponsors($ciniki) {
     } else {
         $strsql = "SELECT sponsors.id, "
             . "sponsors.customer_id,  "
-            . "sponsors.title  "
+            . "sponsors.title,  "
+            . "sponsors.summary  "
             . "FROM ciniki_sponsors AS sponsors "
             . "WHERE sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
             . "";
@@ -89,6 +91,7 @@ function ciniki_sponsors_sponsors($ciniki) {
     //
     if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x04) && isset($args['category_id']) && $args['category_id'] > 0 ) {
         $strsql = "SELECT categories.id, "
+            . "categories.name, "
             . "categories.start_dt, "
             . "categories.end_dt "
             . "FROM ciniki_sponsor_categories AS categories "
@@ -189,19 +192,22 @@ function ciniki_sponsors_sponsors($ciniki) {
             // Link the sponsorships and in kind to sponsors
             //
             foreach($sponsors as $sid => $sponsor) {
-                $sponsors[$sid]['sponsorship_amount'] = '';
-                $sponsors[$sid]['inkind_value'] = '';
-                $sponsors[$sid]['inkind_amount'] = '';
+                $sponsors[$sid]['sponsorship_amount_display'] = '';
+                $sponsors[$sid]['inkind_value_display'] = '';
+                $sponsors[$sid]['inkind_amount_display'] = '';
                 if( isset($sponsorships[$sponsor['customer_id']]) ) {
-                    $sponsors[$sid]['sponsorship_amount'] = '$' . number_format($sponsorships[$sponsor['customer_id']]['total_amount'], 0);
+                    $sponsors[$sid]['sponsorship_amount'] = $sponsorships[$sponsor['customer_id']]['total_amount'];
+                    $sponsors[$sid]['sponsorship_amount_display'] = '$' . number_format($sponsorships[$sponsor['customer_id']]['total_amount'], 0);
                     $totals['sponsorship_amount'] += $sponsorships[$sponsor['customer_id']]['total_amount'];
                 }
                 if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['value'] > 0 ) {
-                    $sponsors[$sid]['inkind_value'] = '$' . number_format($inkind[$sponsor['customer_id']]['value'], 0);
+                    $sponsors[$sid]['inkind_value'] = $inkind[$sponsor['customer_id']]['value'];
+                    $sponsors[$sid]['inkind_value_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['value'], 0);
                     $totals['inkind_value'] += $inkind[$sponsor['customer_id']]['value'];
                 }
                 if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['tenant_amount'] > 0 ) {
-                    $sponsors[$sid]['inkind_amount'] = '$' . number_format($inkind[$sponsor['customer_id']]['tenant_amount'], 0);
+                    $sponsors[$sid]['inkind_amount'] = $inkind[$sponsor['customer_id']]['tenant_amount'];
+                    $sponsors[$sid]['inkind_amount_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['tenant_amount'], 0);
                     $totals['inkind_amount'] += $inkind[$sponsor['customer_id']]['tenant_amount'];
                 }
             }
@@ -209,9 +215,39 @@ function ciniki_sponsors_sponsors($ciniki) {
             // Format totals
             //
             foreach($totals as $k => $v) {
-                $totals[$k] = '$' . number_format($v, 0);
+                $totals[$k . '_display'] = '$' . number_format($v, 0);
             }
         }
+
+        //
+        // Output to excel
+        //
+        if( isset($args['output']) && $args['output'] == 'excel' ) {
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'sponsors', 'templates', 'sponsorsExcel');
+            $rc = ciniki_sponsors_templates_sponsorsExcel($ciniki, $args['tnid'], array(
+                'sponsors' => $sponsors,
+                'category' => $category,
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            if( isset($rc['excel']) ) {
+                //
+                // Output the excel file
+                //
+                header('Content-Type: application/vnd.ms-excel');
+                header('Content-Disposition: attachment;filename="' . $rc['filename'] . '.xls"');
+                header('Cache-Control: max-age=0');
+                
+                $objWriter = PHPExcel_IOFactory::createWriter($rc['excel'], 'Excel5');
+                $objWriter->save('php://output');
+
+                return array('stat'=>'exit');
+            }
+        }
+
+
+
     }
     $rsp = array('stat'=>'ok', 'sponsors'=>$sponsors, 'totals'=>$totals);
 
@@ -325,6 +361,7 @@ function ciniki_sponsors_sponsors($ciniki) {
                 );
         }
     }
+
 
     return $rsp;
 }

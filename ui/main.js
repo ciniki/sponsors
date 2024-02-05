@@ -95,9 +95,9 @@ function ciniki_sponsors_main() {
         } else if( s == 'sponsors' ) {
             switch(j) {
                 case 0: return M.multiline(d.title, d.summary);
-                case 1: return d.sponsorship_amount;
-                case 2: return d.inkind_value;
-                case 3: return d.inkind_amount;
+                case 1: return d.sponsorship_amount_display;
+                case 2: return d.inkind_value_display;
+                case 3: return d.inkind_amount_display;
             }
         }
     }
@@ -105,9 +105,9 @@ function ciniki_sponsors_main() {
         if( s == 'sponsors' && M.modFlagOn('ciniki.sponsors', 0x04) ) {
             switch(i) {
                 case 0: return 'Totals';
-                case 1: return this.data.totals.sponsorship_amount;
-                case 2: return this.data.totals.inkind_value;
-                case 3: return this.data.totals.inkind_amount;
+                case 1: return this.data.totals.sponsorship_amount_display;
+                case 2: return this.data.totals.inkind_value_display;
+                case 3: return this.data.totals.inkind_amount_display;
             }
             return '';
         }
@@ -141,6 +141,10 @@ function ciniki_sponsors_main() {
         this.category_id = c;
         this.open();
     }
+    this.sponsors.downloadExcel = function() {
+        M.api.openFile('ciniki.sponsors.sponsors', {'tnid':M.curTenantID, 'output':'excel', 'category_id':this.category_id});
+        return false;
+    }
     this.sponsors.open = function(cb, lid, lname) {
         if( lid != null ) { this.level_id = lid; }
 //        if( lname != null && lname != '' ) { 
@@ -158,8 +162,12 @@ function ciniki_sponsors_main() {
         if( M.modFlagOn('ciniki.sponsors', 0x01) && this.sections._tabs.selected == 'levels' ) {
             args['level_id'] = this.level_id; 
         }
+        this.delButton('download');
         if( M.modFlagOn('ciniki.sponsors', 0x04) && this.sections._tabs.selected == 'categories' ) {
             args['category_id'] = this.category_id; 
+            if( this.category_id > 0 ) {
+                this.addButton('download', 'Excel', 'M.ciniki_sponsors_main.sponsors.downloadExcel();');
+            }
         }
         if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
             M.api.getJSONCb('ciniki.sponsors.sponsors', args, function(rsp) {
