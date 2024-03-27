@@ -75,6 +75,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     //
     // Remove the level
     //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'objectDelete');
     return ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.sponsors.level', 
         $args['level_id'], $level_uuid);
 }
