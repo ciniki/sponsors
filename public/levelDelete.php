@@ -51,7 +51,7 @@ function ciniki_sponsors_levelDelete(&$ciniki) {
     if( $rc['stat'] != 'ok' ) {
         return $rc;
     }
-    if isset($rc['num']['sponsors']) && $rc['num']['sponsors'] > 0 ) {
+    if( isset($rc['num']['sponsors']) && $rc['num']['sponsors'] > 0 ) {
         return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.8', 'msg'=>'All sponsors must be removed from the sponsorship level before it can be removed.'));
     }
 
