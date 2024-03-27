@@ -178,7 +178,6 @@ function ciniki_sponsors_categoryUpdate(&$ciniki) {
                 );
         }
     }
-        error_log(print_r($rsp,true));
 
     return $rsp;
 }
