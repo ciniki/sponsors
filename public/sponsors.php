@@ -40,6 +40,16 @@ function ciniki_sponsors_sponsors($ciniki) {
     $modules = $ac['modules'];
 
     //
+    // Load the tenant settings
+    //
+    ciniki_core_loadMethod($ciniki, 'ciniki', 'tenants', 'private', 'intlSettings');
+    $rc = ciniki_tenants_intlSettings($ciniki, $args['tnid']);
+    if( $rc['stat'] != 'ok' ) {
+        return $rc;
+    }
+    $intl_timezone = $rc['settings']['intl-default-timezone'];
+    
+    //
     // Load the sponsors
     //
     if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x04) && isset($args['category_id']) ) {
@@ -308,6 +318,8 @@ function ciniki_sponsors_sponsors($ciniki) {
         $strsql = "SELECT categories.id, "
             . "categories.name, "
             . "categories.sequence, "
+            . "categories.start_dt, "
+            . "categories.end_dt, "
             . "COUNT(sponsors.id) AS num_sponsors "
             . "FROM ciniki_sponsor_categories AS categories "
             . "LEFT JOIN ciniki_sponsors_categories AS scats ON ("
@@ -325,12 +337,29 @@ function ciniki_sponsors_sponsors($ciniki) {
         ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryArrayTree');
         $rc = ciniki_core_dbHashQueryArrayTree($ciniki, $strsql, 'ciniki.sponsors', array(
             array('container'=>'categories', 'fname'=>'id', 'name'=>'level',
-                'fields'=>array('id', 'name', 'sequence', 'num_sponsors')),
+                'fields'=>array('id', 'name', 'sequence', 'start_dt', 'end_dt', 'num_sponsors')),
             ));
         if( $rc['stat'] != 'ok' ) {
             return $rc;
         }
         $rsp['categories'] = isset($rc['categories']) ? $rc['categories'] : array();
+
+        foreach($rsp['categories'] as $cid => $cat) {
+            $rsp['categories'][$cid]['date_range'] = '';
+            if( $cat['start_dt'] != '' && $cat['end_dt'] != '' 
+                && $cat['start_dt'] != '0000-00-00 00:00:00' && $cat['end_dt'] != '0000-00-00 00:00:00' 
+                ) {
+                $start_dt = new DateTime($cat['start_dt'], new DateTimezone('UTC'));
+                $start_dt->setTimezone(new DateTimezone($intl_timezone));
+                $end_dt = new DateTime($cat['end_dt'], new DateTimezone('UTC'));
+                $end_dt->setTimezone(new DateTimezone($intl_timezone));
+                if( $start_dt->format('Y') == $end_dt->format('Y')) {
+                    $rsp['categories'][$cid]['date_range'] = $start_dt->format('M j') . ' - ' . $end_dt->format('M j, Y');
+                } else {
+                    $rsp['categories'][$cid]['date_range'] = $start_dt->format('M j, Y') . ' - ' . $end_dt->format('M j, Y');
+                }
+            }
+        }
 
         //
         // Check for sponsors with no sponsorship level

@@ -30,6 +30,7 @@ function ciniki_sponsors_main() {
             },
         'categories':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
             'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x04) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'categories' ? 'yes' : 'no'; },
+            'cellClasses':['multiline'],
             'editFn':function(s, i, d) {
                 return 'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
             },
@@ -91,7 +92,7 @@ function ciniki_sponsors_main() {
         if( s == 'levels' ) {
             return M.textCount(d.name, d.num_sponsors);
         } else if( s == 'categories' ) {
-            return M.textCount(d.name, d.num_sponsors);
+            return M.multiline(M.textCount(d.name, d.num_sponsors), d.date_range);
         } else if( s == 'sponsors' ) {
             switch(j) {
                 case 0: return M.multiline(d.title, d.summary);
