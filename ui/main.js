@@ -14,11 +14,11 @@ function ciniki_sponsors_main() {
     this.sponsors.level_id = 0;
     this.sponsors.category_id = 0;
     this.sponsors.sections = {
-        '_tabs':{'label':'', 'selected':'categories', 'aside':'yes',
-            'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x05); },
+        '_tabs':{'label':'', 'type':'paneltabs', 'selected':'categories', 'aside':'yes',
+            'visible':function() { console.log(M.modFlagSet('ciniki.sponsors', 0x05)); return M.modFlagSet('ciniki.sponsors', 0x05); },
             'tabs':{
-                'levels':{'label':'Levels', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("levels");'},
                 'categories':{'label':'Categories', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("categories");'},
+                'levels':{'label':'Levels', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("levels");'},
             }},
         'levels':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
             'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x01) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'levels' ? 'yes' : 'no'; },
@@ -101,6 +101,10 @@ function ciniki_sponsors_main() {
             }
         }
     }
+    this.sponsors.switchTab = function(t) {
+        this.sections._tabs.selected = t;
+        this.open();
+    }
     this.sponsors.footerValue = function(s, i, sc) {
         if( s == 'sponsors' && M.modFlagOn('ciniki.sponsors', 0x04) ) {
             switch(i) {
@@ -177,6 +181,11 @@ function ciniki_sponsors_main() {
                 }
                 var p = M.ciniki_sponsors_main.sponsors;
                 p.data = rsp;
+                if( p.sections._tabs.selected == 'levels' ) {
+                    p.sections.sponsors.num_cols = 1;
+                } else {
+                    p.sections.sponsors.num_cols = 4;
+                }
                 p.refresh();
                 p.show(cb);
             });
