@@ -36,7 +36,7 @@ function ciniki_sponsors_sponsorAdd(&$ciniki) {
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'prepareArgs');
     $rc = ciniki_core_prepareArgs($ciniki, 'no', array(
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
-        'title'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Title'), 
+        'title'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor Name'), 
         'permalink'=>array('required'=>'no', 'blank'=>'no', 'name'=>'Permalink'), 
         'customer_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Customer'), 
         'level_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Level'), 

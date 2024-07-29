@@ -49,8 +49,12 @@ function ciniki_sponsors_main() {
                         p.refreshSection("categories");
                     });
                 },
-            'addTxt':'Add Category',
-            'addFn':'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+            'menu':{
+                'add':{
+                    'label':'Add Category',
+                    'fn':'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+                    },
+                },
             },
         'search':{'label':'', 'type':'livesearchgrid', 'livesearchcols':1,
             'hint':'Search Sponsors', 
@@ -61,8 +65,12 @@ function ciniki_sponsors_main() {
             'headerValues':null,
             'cellClasses':['multiline'],
             'noData':'No sponsors',
-            'addTxt':'Add Sponsor',
-            'addTopFn':'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
+            'menu':{
+                'add':{
+                    'label':'Add Sponsor',
+                    'fn':'M.ciniki_sponsors_main.sponsor.open(\'M.ciniki_sponsors_main.sponsors.open();\',0,M.ciniki_sponsors_main.sponsors.level_id);',
+                    },
+                },
             },
         };
     this.sponsors.liveSearchCb = function(s, i, value) {
@@ -392,7 +400,7 @@ function ciniki_sponsors_main() {
     this.sponsor.sponsor_id = 0;
     this.sponsor.sections = {
         'general':{'label':'Sponsor', 'aside':'yes', 'fields':{
-            'title':{'label':'Name', 'hint':'Sponsor name', 'type':'text'},
+            'title':{'label':'Name', 'hint':'Sponsor name', 'type':'text', 'livesearch':'yes'},
             'level_id':{'label':'Level', 'active':'no', 'type':'select', 'options':{}},
             'sequence':{'label':'Sequence', 'hint':'1-255', 'type':'text', 'size':'small'},
             'webflags':{'label':'Website', 'type':'flags', 'toggle':'no', 'join':'yes', 'flags':this.webFlags},
@@ -408,10 +416,11 @@ function ciniki_sponsors_main() {
             'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x04); },
             'cellClasses':['label', ''],
             'noData':'No linked customer account',
-            'addTxt':'Edit Customer Account',
-            'addFn':'M.ciniki_sponsors_main.sponsor.editCustomer();',
-            'changeTxt':'Change Customer Account',
-            'changeFn':'M.ciniki_sponsors_main.sponsor.changeCustomer();',
+            'customer_id':0,
+//            'addTxt':'Edit Customer Account',
+//            'addFn':'M.ciniki_sponsors_main.sponsor.editCustomer();',
+//            'changeTxt':'Change Customer Account',
+//            'changeFn':'M.ciniki_sponsors_main.sponsor.changeCustomer();',
             },
         'contacts':{'label':'Employees', 'type':'simplegrid', 'num_cols':2, 'aside':'yes',
             'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x04); },
@@ -444,7 +453,7 @@ function ciniki_sponsors_main() {
             },
         'donateditems':{'label':'Donated Items', 'type':'simplegrid', 'num_cols':5,
             'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'items' ? 'yes' : 'hidden'; },
-            'headerValues':['Item', 'Value', 'Exhibit', 'Sold Amount', 'Date'],
+            'headerValues':['Donated', 'Item', 'Value', 'Sold Amount', 'Event'],
             'noData':'No donated items',
             },
         '_image':{'label':'Sponsor Logo', 'type':'imageform', 
@@ -473,6 +482,22 @@ function ciniki_sponsors_main() {
     this.sponsor.fieldHistoryArgs = function(s, i) {
         return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
             'sponsor_id':this.sponsor_id, 'field':i}};
+    }
+    this.sponsor.liveSearchCb = function(s, i, value) {
+        if( i == 'title' ) {
+            M.api.getJSONBgCb('ciniki.sponsors.sponsorSearch', {'tnid':M.curTenantID, 'field':i, 'start_needle':value, 'limit':15}, 
+                function(rsp) {
+                    M.ciniki_sponsors_main.sponsor.liveSearchShow(s, i, M.gE(M.ciniki_sponsors_main.sponsor.panelUID + '_' + i), rsp.sponsors); 
+                });
+        }
+    }
+    this.sponsor.liveSearchResultValue = function(s, f, i, j, d) {
+        return d.title;
+    }
+    this.sponsor.liveSearchResultRowFn = function(s, f, i, j, d) {
+        if( f == 'title' ) {
+            return 'M.ciniki_sponsors_main.sponsor.open(null,\'' + d.id + '\');';
+        }
     }
     this.sponsor.addDropImage = function(iid) {
         M.ciniki_sponsors_main.sponsor.setFieldValue('primary_image_id', iid, null, null);
@@ -560,11 +585,11 @@ function ciniki_sponsors_main() {
         }
         if( s == 'donateditems' ) {
             switch(j) {
-                case 0: return d.name;
-                case 1: return d.value_display;
-                case 2: return d.exhibit_name;
-                case 3: return d.total_amount_display;
-                case 4: return d.sell_date_display;
+                case 0: return d.donated_date;
+                case 1: return d.name;
+                case 2: return d.value_amount;
+                case 3: return d.sold_amount;
+                case 4: return d.event_name;
             }
         }
     }
@@ -591,34 +616,35 @@ function ciniki_sponsors_main() {
             args['donateditems'] = 'yes';
         }
         M.api.getJSONCb('ciniki.sponsors.sponsorGet', args, function(rsp) {
-                if( rsp.stat != 'ok' ) {
-                    M.api.err(rsp);
-                    return false;
+            if( rsp.stat != 'ok' ) {
+                M.api.err(rsp);
+                return false;
+            }
+            var p = M.ciniki_sponsors_main.sponsor;
+            p.data = rsp.sponsor;
+            if( rsp.sponsor.customer_id > 0 ) {
+                p.customer_id = rsp.sponsor.customer_id;
+                p.sections.customer_details.addTxt = 'Edit Customer Account';
+                p.sections.customer_details.changeTxt = 'Change Customer Account';
+            } else {
+                p.customer_id = 0;
+                p.sections.customer_details.addTxt = 'Link Customer Account';
+                p.sections.customer_details.changeTxt = '';
+            }
+            if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
+                p.sections.general.fields.level_id.options = {};
+                for(i in rsp.levels) {
+                    p.sections.general.fields.level_id.options[rsp.levels[i].id] = rsp.levels[i].name;
                 }
-                var p = M.ciniki_sponsors_main.sponsor;
-                p.data = rsp.sponsor;
-                if( rsp.sponsor.customer_id > 0 ) {
-                    p.customer_id = rsp.sponsor.customer_id;
-                    p.sections.customer_details.addTxt = 'Edit Customer Account';
-                    p.sections.customer_details.changeTxt = 'Change Customer Account';
-                } else {
-                    p.customer_id = 0;
-                    p.sections.customer_details.addTxt = 'Link Customer Account';
-                    p.sections.customer_details.changeTxt = '';
-                }
-                if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
-                    p.sections.general.fields.level_id.options = {};
-                    for(i in rsp.levels) {
-                        p.sections.general.fields.level_id.options[rsp.levels[i].id] = rsp.levels[i].name;
-                    }
-                    p.sections.general.fields.level_id.active = 'yes';
-                } else {
-                    p.sections.general.fields.level_id.active = 'no';
-                }
-                p.sections._categories.fields.categories.list = rsp.categories;
-                p.refresh();
-                p.show(cb);
-                });
+                p.sections.general.fields.level_id.active = 'yes';
+            } else {
+                p.sections.general.fields.level_id.active = 'no';
+            }
+            p.sections._categories.fields.categories.list = rsp.categories;
+            p.sections.customer_details.customer_id = rsp.sponsor.customer_id;
+            p.refresh();
+            p.show(cb);
+            });
     }
     this.sponsor.save = function(cb) {
         if( cb == null ) { cb = 'M.ciniki_sponsors_main.sponsor.close();'; }
@@ -707,6 +733,10 @@ function ciniki_sponsors_main() {
             }
         } else {
             this.sponsors.size = 'medium';
+        }
+        this.sponsor.size = 'medium mediumaside';
+        if( M.modOn('ciniki.iks') ) {
+            this.sponsor.size = 'large mediumaside';
         }
 
         if( args.sponsor_id != null ) {

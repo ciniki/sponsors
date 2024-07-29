@@ -117,9 +117,9 @@ function ciniki_sponsors_sponsors($ciniki) {
         }
         $category = $rc['category'];
       
-        if( $category['start_dt'] != '0000-00-00 00:00:00' 
+/*        if( $category['start_dt'] != '0000-00-00 00:00:00' 
             && $category['end_dt'] != '0000-00-00 00:00:00' 
-            ) {
+            ) { */
             //
             // Get the sponsorships between the date
             //
@@ -141,10 +141,14 @@ function ciniki_sponsors_sponsors($ciniki) {
                     . "items.object_id = packages.id "
                     . "AND packages.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
                     . ") "
-                . "WHERE invoices.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
-                . "AND invoices.invoice_date >= '" . ciniki_core_dbQuote($ciniki, $category['start_dt']) . "' "
-                . "AND invoices.invoice_date < '" . ciniki_core_dbQuote($ciniki, $category['end_dt']) . "' "
-                . "GROUP BY invoices.customer_id "
+                . "WHERE invoices.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' ";
+            if( $category['start_dt'] != '0000-00-00 00:00:00' 
+                && $category['end_dt'] != '0000-00-00 00:00:00' 
+                ) {
+                $strsql .= "AND invoices.invoice_date >= '" . ciniki_core_dbQuote($ciniki, $category['start_dt']) . "' "
+                    . "AND invoices.invoice_date < '" . ciniki_core_dbQuote($ciniki, $category['end_dt']) . "' ";
+            }
+            $strsql .= "GROUP BY invoices.customer_id "
                 . "ORDER BY invoices.invoice_date DESC "
                 . "";
             ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
@@ -161,7 +165,7 @@ function ciniki_sponsors_sponsors($ciniki) {
             //
             // Get the inkind donations between the date range
             //
-            $strsql = "SELECT items.donor_customer_id, "
+/*            $strsql = "SELECT items.donor_customer_id, "
                 . "SUM(items.unit_amount) AS value, "
                 . "SUM(IFNULL(sales.tenant_amount, '0')) AS tenant_amount, "
                 . "SUM(IFNULL(sales.total_amount, '0')) AS total_amount "
@@ -197,6 +201,51 @@ function ciniki_sponsors_sponsors($ciniki) {
                 return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.ags.367', 'msg'=>'', 'err'=>$rc['err']));
             }
             $inkind = isset($rc['items']) ? $rc['items'] : array();
+*/
+            //
+            // Get the inkind donations between the date range
+            //
+            $strsql = "SELECT items.customer_id, "
+                . "SUM(items.value_amount) AS value, "
+                . "SUM(items.sold_amount) AS total_amount "
+                . "FROM ciniki_iks_items AS items "
+                . "LEFT JOIN ciniki_iks_products AS products ON ("
+                    . "items.product_id = products.id "
+                    . "AND products.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                    . ") "
+                . "LEFT JOIN ciniki_iks_event_products AS ep ON ("
+                    . "products.id = ep.product_id "
+                    . "AND ep.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                    . ") "
+                . "LEFT JOIN ciniki_iks_events AS events ON ("
+                    . "ep.event_id = events.id "
+                    . "AND events.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                    . ") "
+                . "WHERE items.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                . "AND items.customer_id > 0 ";
+            if( $category['start_dt'] != '0000-00-00 00:00:00' 
+                && $category['end_dt'] != '0000-00-00 00:00:00' 
+                ) {
+                $strsql .= "AND (("
+                    . "items.status < 70 "
+                    . "AND items.donated_date >= '" . ciniki_core_dbQuote($ciniki, $category['start_dt']) . "' "
+                    . "AND items.donated_date <= '" . ciniki_core_dbQuote($ciniki, $category['end_dt']) . "' "
+                    . ") OR ("
+                    . "events.sales_start_dt >= '" . ciniki_core_dbQuote($ciniki, $category['start_dt']) . "' "
+                    . "AND events.sales_end_dt <= '" . ciniki_core_dbQuote($ciniki, $category['end_dt']) . "' "
+                    . ")) ";
+            }
+            $strsql .= "GROUP BY items.customer_id "
+                . "ORDER BY items.customer_id, products.code, products.name "
+                . "";
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryIDTree');
+            $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.iks', array(
+                array('container'=>'items', 'fname'=>'customer_id', 'fields'=>array('value', 'total_amount')),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.ags.367', 'msg'=>'', 'err'=>$rc['err']));
+            }
+            $inkind = isset($rc['items']) ? $rc['items'] : array();
 
             //
             // Link the sponsorships and in kind to sponsors
@@ -215,10 +264,10 @@ function ciniki_sponsors_sponsors($ciniki) {
                     $sponsors[$sid]['inkind_value_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['value'], 0);
                     $totals['inkind_value'] += $inkind[$sponsor['customer_id']]['value'];
                 }
-                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['tenant_amount'] > 0 ) {
-                    $sponsors[$sid]['inkind_amount'] = $inkind[$sponsor['customer_id']]['tenant_amount'];
-                    $sponsors[$sid]['inkind_amount_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['tenant_amount'], 0);
-                    $totals['inkind_amount'] += $inkind[$sponsor['customer_id']]['tenant_amount'];
+                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['total_amount'] > 0 ) {
+                    $sponsors[$sid]['inkind_amount'] = $inkind[$sponsor['customer_id']]['total_amount'];
+                    $sponsors[$sid]['inkind_amount_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['total_amount'], 0);
+                    $totals['inkind_amount'] += $inkind[$sponsor['customer_id']]['total_amount'];
                 }
             }
             //
@@ -227,7 +276,7 @@ function ciniki_sponsors_sponsors($ciniki) {
             foreach($totals as $k => $v) {
                 $totals[$k . '_display'] = '$' . number_format($v, 0);
             }
-        }
+//        }
 
         //
         // Output to excel

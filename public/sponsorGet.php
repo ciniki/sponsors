@@ -92,8 +92,9 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             array('container'=>'sponsors', 'fname'=>'id', 'name'=>'sponsor',
                 'fields'=>array('id', 'title', 'permalink', 'level_id', 'customer_id',
                     'sequence', 'summary', 'webflags', 'url', 'primary_image_id', 
-                    'excerpt', 'content', 'notes')),
-        ));
+                    'excerpt', 'content', 'notes',
+                    )),
+            ));
         if( $rc['stat'] != 'ok' ) {
             return $rc;
         }
@@ -161,7 +162,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         // Get the list of sponsorships
         //
         if( isset($args['sponsorships']) && $args['sponsorships'] == 'yes' 
-            && ciniki_core_checkModuleFlags($ciniki, 'ciniki.ags', 0x10) // Packages enabled
+            && ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x10) // Packages enabled
             ) {
             $strsql = "SELECT items.id, "
                 . "invoices.id AS invoice_id, "
@@ -219,19 +220,19 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         // Get the list of donated items
         //
         if( isset($args['donateditems']) && $args['donateditems'] == 'yes' 
-            && ciniki_core_checkModuleActive($ciniki, 'ciniki.ags') 
+            && ciniki_core_checkModuleActive($ciniki, 'ciniki.iks') 
             && $sponsor['customer_id'] > 0 
             ) {
-            ciniki_core_loadMethod($ciniki, 'ciniki', 'ags', 'hooks', 'uiCustomersData');
-            $rc = ciniki_ags_hooks_uiCustomersData($ciniki, $args['tnid'], array(
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'iks', 'hooks', 'uiCustomersData');
+            $rc = ciniki_iks_hooks_uiCustomersData($ciniki, $args['tnid'], array(
                 'customer_id' => $sponsor['customer_id'],
                 ));
             if( $rc['stat'] != 'ok' ) {
                 return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.54', 'msg'=>'Unable to load donated items', 'err'=>$rc['err']));
             }
             $sponsor['donateditems'] = array();
-            if( isset($rc['tabs'][0]['sections']['ciniki.ags.donations']['data']) ) {
-                $sponsor['donateditems'] = $rc['tabs'][0]['sections']['ciniki.ags.donations']['data'];
+            if( isset($rc['tabs'][0]['sections']['ciniki.iks.donations']['data']) ) {
+                $sponsor['donateditems'] = $rc['tabs'][0]['sections']['ciniki.iks.donations']['data'];
             }
         }
     }

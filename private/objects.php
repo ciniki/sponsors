@@ -19,8 +19,8 @@ function ciniki_sponsors_objects($ciniki) {
         'o_container' => 'sponsors',
         'table'=>'ciniki_sponsors',
         'fields'=>array(
-            'title'=>array(),
-            'permalink'=>array(),
+            'title'=>array('name'=>'Name'),
+            'permalink'=>array('name'=>'Permalink'),
             'customer_id'=>array('ref'=>'ciniki.customers.customer', 'default'=>'0'),
             'level_id'=>array('ref'=>'ciniki.sponsors.level'),
             'sequence'=>array(), 
