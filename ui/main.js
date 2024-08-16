@@ -523,7 +523,7 @@ function ciniki_sponsors_main() {
         this.setFieldValue(fid, 0, null, null);
         return true;
     };
-    this.sponsor.editCustomer = function() {
+/*    this.sponsor.editCustomer = function() {
         this.save("M.startApp('ciniki.customers.edit',null,'M.ciniki_sponsors_main.sponsor.open();','mc',{'next':'M.ciniki_sponsors_main.sponsor.updateCustomer', 'action':'edit', 'customer_id':M.ciniki_sponsors_main.sponsor.data.customer_id});");
     }
     this.sponsor.changeCustomer = function() {
@@ -537,7 +537,7 @@ function ciniki_sponsors_main() {
                 } 
                 M.ciniki_sponsors_main.sponsor.open();
             });
-    }
+    } */
     this.sponsor.addContact = function() {
         this.save("M.startApp('ciniki.customers.edit',null,'M.ciniki_sponsors_main.sponsor.open();','mc',{'next':'M.ciniki_sponsors_main.sponsor.updateContact', 'action':'change', 'current_id':0,'customer_id':0});");
     }
@@ -666,6 +666,9 @@ function ciniki_sponsors_main() {
         if( cb == null ) { cb = 'M.ciniki_sponsors_main.sponsor.close();'; }
         if( this.sponsor_id > 0 ) {
             var c = this.serializeForm('no');
+            if( this.sections.customer_details.customer_id != this.data.customer_id ) {
+                c += '&customer_id=' + this.sections.customer_details.customer_id;
+            }
             if( c != '' ) {
                 M.api.postJSONCb('ciniki.sponsors.sponsorUpdate', 
                     {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id}, c,
@@ -681,6 +684,7 @@ function ciniki_sponsors_main() {
             }
         } else {
             var c = this.serializeForm('yes');
+            c += '&customer_id=' + this.sections.customer_details.customer_id;
             M.api.postJSONCb('ciniki.sponsors.sponsorAdd', {'tnid':M.curTenantID}, c, function(rsp) {
                 if( rsp.stat != 'ok' ) {
                     M.api.err(rsp);
