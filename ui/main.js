@@ -28,7 +28,7 @@ function ciniki_sponsors_main() {
             'addTxt':'Add Level',
             'addFn':'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
             },
-        'categories':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
+        'categories':{'label':'Categories', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
             'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x04) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'categories' ? 'yes' : 'no'; },
             'cellClasses':['multiline'],
             'editFn':function(s, i, d) {
