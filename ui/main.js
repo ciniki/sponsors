@@ -15,24 +15,34 @@ function ciniki_sponsors_main() {
     this.sponsors.category_id = 0;
     this.sponsors.sections = {
         '_tabs':{'label':'', 'type':'paneltabs', 'selected':'categories', 'aside':'yes',
-            'visible':function() { console.log(M.modFlagSet('ciniki.sponsors', 0x05)); return M.modFlagSet('ciniki.sponsors', 0x05); },
+            'visible':function() { return M.modFlagSet('ciniki.sponsors', 0x05); },
             'tabs':{
                 'categories':{'label':'Categories', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("categories");'},
                 'levels':{'label':'Levels', 'fn':'M.ciniki_sponsors_main.sponsors.switchTab("levels");'},
             }},
-        'levels':{'label':'', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
+        'levels':{'label':'Levels', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
             'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x01) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'levels' ? 'yes' : 'no'; },
             'editFn':function(s, i, d) {
-                return 'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+                if( d.id > 0 ) {
+                    return 'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+                }
+                return '';
             },
-            'addTxt':'Add Level',
-            'addFn':'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+            'menu':{
+                'add':{
+                    'label':'Add Level',
+                    'fn':'M.ciniki_sponsors_main.level.open(\'M.ciniki_sponsors_main.sponsors.open();\',0);',
+                    },
+                },
             },
         'categories':{'label':'Categories', 'type':'simplegrid', 'num_cols':1, 'aside':'yes',
             'visible':function() { return M.modFlagOn('ciniki.sponsors', 0x04) && M.ciniki_sponsors_main.sponsors.sections._tabs.selected == 'categories' ? 'yes' : 'no'; },
             'cellClasses':['multiline'],
             'editFn':function(s, i, d) {
-                return 'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+                if( d.id > 0 ) {
+                    return 'M.ciniki_sponsors_main.category.open(\'M.ciniki_sponsors_main.sponsors.open();\',\'' + d.id + '\');';
+                }
+                return '';
             },
             'seqDrop':function(e,from,to) {
                 M.api.getJSONCb('ciniki.sponsors.categoryUpdate', {'tnid':M.curTenantID, 
@@ -220,7 +230,7 @@ function ciniki_sponsors_main() {
         'ciniki_sponsors_main', 'level',
         'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.level');
     this.level.data = null;
-    this.level.sponsor_id = 0;
+    this.level.level_id = 0;
     this.level.sections = {
         '_image':{'label':'', 'aside':'yes', 'type':'imageform', 'fields':{
             'primary_image_id':{'label':'', 'type':'image_id', 'hidelabel':'yes', 'controls':'all', 'history':'no'},
@@ -232,13 +242,16 @@ function ciniki_sponsors_main() {
             }}, 
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.level.save();'},
-            'delete':{'label':'Delete', 'fn':'M.ciniki_sponsors_main.level.remove();'},
+            'delete':{'label':'Delete', 
+                'visible':function() { return M.ciniki_sponsors_main.level.level_id > 0 ? 'yes' : 'no'; },
+                'fn':'M.ciniki_sponsors_main.level.remove();',
+                },
             }},
         };
     this.level.fieldValue = function(s, i, d) { return this.data[i]; }
     this.level.fieldHistoryArgs = function(s, i) {
         return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
-            'sponsor_id':this.sponsor_id, 'field':i}};
+            'level_id':this.level_id, 'field':i}};
     }
     this.level.open = function(cb, lid) {
         this.reset();
@@ -310,7 +323,7 @@ function ciniki_sponsors_main() {
         'ciniki_sponsors_main', 'category',
         'mc', 'medium', 'sectioned', 'ciniki.sponsors.main.category');
     this.category.data = null;
-    this.category.sponsor_id = 0;
+    this.category.category_id = 0;
     this.category.sections = {
         'general':{'label':'', 'fields':{
             'name':{'label':'Name', 'hint':'Level name', 'type':'text'},
@@ -321,15 +334,15 @@ function ciniki_sponsors_main() {
         '_buttons':{'label':'', 'buttons':{
             'save':{'label':'Save', 'fn':'M.ciniki_sponsors_main.category.save();'},
             'delete':{'label':'Delete', 
-                'visible':function() { return M.ciniki_sponsors_main.category.sponsor_id > 0 ? 'yes' : 'no'; },
+                'visible':function() { return M.ciniki_sponsors_main.category.category_id > 0 ? 'yes' : 'no'; },
                 'fn':'M.ciniki_sponsors_main.category.remove();',
                 },
             }},
         };
     this.category.fieldValue = function(s, i, d) { return this.data[i]; }
     this.category.fieldHistoryArgs = function(s, i) {
-        return {'method':'ciniki.sponsors.sponsorHistory', 'args':{'tnid':M.curTenantID, 
-            'sponsor_id':this.sponsor_id, 'field':i}};
+        return {'method':'ciniki.sponsors.categoryHistory', 'args':{'tnid':M.curTenantID, 
+            'category_id':this.category_id, 'field':i}};
     }
     this.category.open = function(cb, lid) {
         this.reset();
@@ -382,6 +395,9 @@ function ciniki_sponsors_main() {
                     if( rsp.stat != 'ok' ) {
                         M.api.err(rsp);
                         return false;
+                    }
+                    if( M.ciniki_sponsors_main.category.category_id == M.ciniki_sponsors_main.sponsors.category_id ) {
+                        M.ciniki_sponsors_main.sponsors.category_id = 0;
                     }
                     M.ciniki_sponsors_main.category.close();
                 });
@@ -723,7 +739,7 @@ function ciniki_sponsors_main() {
         if( M.modFlagAny('ciniki.sponsors', 0x05) == 'yes' ) {
             this.sponsors.size = 'full narrowaside';
             if( M.modFlagOn('ciniki.sponsors', 0x05) ) {
-                this.sponsors.sections.levels.label = '';
+                this.sponsors.sections.levels.label = 'Levels';
             } else if( M.modFlagOn('ciniki.sponsors', 0x01) ) {
                 this.sponsors.sections._tabs.selected = 'levels';
                 this.sponsors.sections.levels.label = 'Levels';

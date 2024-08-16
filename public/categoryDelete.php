@@ -71,6 +71,21 @@ function ciniki_sponsors_categoryDelete(&$ciniki) {
     }
 
     //
+    // Get the list of sponsors to remove from category
+    //
+    $strsql = "SELECT id, uuid "
+        . "FROM ciniki_sponsors_categories "
+        . "WHERE category_id = '" . ciniki_core_dbQuote($ciniki, $args['category_id']) . "' "
+        . "AND tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+        . "";
+    $rc = ciniki_core_dbHashQuery($ciniki, $strsql, 'ciniki.sponsors', 'item');
+    if( $rc['stat'] != 'ok' ) {
+        return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.72', 'msg'=>'Unable to load item', 'err'=>$rc['err']));
+    }
+    $sponsors = isset($rc['rows']) ? $rc['rows'] : array();
+    
+
+    //
     // Start transaction
     //
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbTransactionStart');
@@ -82,6 +97,18 @@ function ciniki_sponsors_categoryDelete(&$ciniki) {
     $rc = ciniki_core_dbTransactionStart($ciniki, 'ciniki.sponsors');
     if( $rc['stat'] != 'ok' ) {
         return $rc;
+    }
+
+    //
+    // Remove sponsors from categories
+    //
+    foreach($sponsors as $sponsor) {
+        $rc = ciniki_core_objectDelete($ciniki, $args['tnid'], 'ciniki.sponsors.categorysponsor',
+            $sponsor['id'], $sponsor['uuid'], 0x04);
+        if( $rc['stat'] != 'ok' ) {
+            ciniki_core_dbTransactionRollback($ciniki, 'ciniki.sponsors');
+            return $rc;
+        }
     }
 
     //
