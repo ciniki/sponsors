@@ -37,6 +37,7 @@ function ciniki_sponsors_sapos_itemSearch($ciniki, $tnid, $args) {
         . "packages.amount "
         . "FROM ciniki_sponsor_packages AS packages "
         . "WHERE packages.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
+        . "AND packages.status < 90 "
         . "HAVING ("
             . "packages.category LIKE '" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "
             . "OR packages.category LIKE '%" . ciniki_core_dbQuote($ciniki, $args['start_needle']) . "%' "

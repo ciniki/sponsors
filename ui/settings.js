@@ -93,6 +93,7 @@ function ciniki_sponsors_settings() {
         'general':{'label':'Sponsorship Package', 'fields':{
             'invoice_code':{'label':'Code', 'type':'text'},
             'name':{'label':'Name', 'required':'yes', 'type':'text'},
+            'status':{'label':'Status', 'type':'toggle', 'toggles':{'10':'Active', '90':'Archived'}},
             'invoice_name':{'label':'Invoice Description', 'required':'yes', 'type':'text'},
 //            'subname':{'label':'', 'type':'text'},
 //            'object':{'label':'', 'type':'text'},

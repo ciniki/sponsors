@@ -25,6 +25,7 @@ function ciniki_sponsors_packageAdd(&$ciniki) {
         'permalink'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Permalink'),
         'invoice_code'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Invoice Code'),
         'invoice_name'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Invoice Name'),
+        'status'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Status'),
         'flags'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Options'),
         'object'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object'),
         'object_id'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Object ID'),

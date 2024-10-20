@@ -112,6 +112,7 @@ function ciniki_sponsors_objects($ciniki) {
             'permalink' => array('name'=>'Permalink', 'default'=>''),
             'invoice_code' => array('name'=>'Code', 'default'=>''),
             'invoice_name' => array('name'=>'Invoice Name', 'default'=>''),
+            'status' => array('name'=>'Status', 'default'=>10),
             'flags' => array('name'=>'Options', 'default'=>0),
             'object' => array('name'=>'Object', 'default'=>''),
             'object_id' => array('name'=>'Object ID', 'default'=>''),
