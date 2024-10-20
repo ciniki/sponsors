@@ -94,7 +94,7 @@ function ciniki_sponsors_sponsors($ciniki) {
         return $rc;
     }
     $sponsors = isset($rc['sponsors']) ? $rc['sponsors'] : array();
-    $totals = array('sponsorship_amount'=>0, 'inkind_value'=>0, 'inkind_amount'=>0);
+    $totals = array('sponsorship_amount'=>0, 'donations_amount'=>0, 'inkind_value'=>0, 'inkind_amount'=>0);
 
     //
     // Load the category and sum the sponsorships and in kind donations
@@ -161,6 +161,57 @@ function ciniki_sponsors_sponsors($ciniki) {
                 return $rc;
             }
             $sponsorships = isset($rc['sponsorships']) ? $rc['sponsorships'] : array();
+
+            //
+            // Get the donations
+            //
+            $strsql = "SELECT invoices.customer_id, "
+                . "items.id AS item_id, "
+                . "items.flags AS item_flags, "
+                . "items.quantity, "
+                . "items.unit_donation_amount, "
+                . "items.total_amount "
+                . "FROM ciniki_sapos_invoices AS invoices "
+                . "INNER JOIN ciniki_sapos_invoice_items AS items ON ("
+                    . "invoices.id = items.invoice_id "
+                    . "AND (items.flags&0x8800) > 0 "   // Full or partial donation
+                    . "AND items.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                    . ") "
+                . "WHERE invoices.tnid = '" . ciniki_core_dbQuote($ciniki, $args['tnid']) . "' "
+                . "AND invoices.invoice_type IN (10,30) "
+                . "";
+            if( $category['start_dt'] != '0000-00-00 00:00:00' 
+                && $category['end_dt'] != '0000-00-00 00:00:00' 
+                ) {
+                $strsql .= "AND invoices.invoice_date >= '" . ciniki_core_dbQuote($ciniki, $category['start_dt']) . "' "
+                    . "AND invoices.invoice_date < '" . ciniki_core_dbQuote($ciniki, $category['end_dt']) . "' ";
+            }
+            $strsql .= "ORDER BY invoices.customer_id "
+                . "";
+            $rc = ciniki_core_dbHashQueryIDTree($ciniki, $strsql, 'ciniki.sapos', array(
+                array('container'=>'customers', 'fname'=>'customer_id', 
+                    'fields'=>array('id'=>'customer_id'),
+                    ), 
+                array('container'=>'items', 'fname'=>'item_id', 
+                    'fields'=>array('id'=>'item_id', 'flags'=>'item_flags', 'quantity', 'unit_donation_amount', 'total_amount'),
+                    ),
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return $rc;
+            }
+            $donations = isset($rc['customers']) ? $rc['customers'] : array();
+            foreach($donations as $iid => $cust) {
+                $donations[$iid]['donation_amount'] = 0;
+                if( isset($cust['items']) ) {
+                    foreach($cust['items'] as $item) {
+                        if( ($item['flags']&0x0800) == 0x0800 ) {
+                            $donations[$iid]['donation_amount'] = bcadd($donations[$iid]['donation_amount'], ($item['quantity'] * $item['unit_donation_amount']), 6);
+                        } elseif( ($item['flags']&0x8000) == 0x8000 ) {
+                            $donations[$iid]['donation_amount'] = bcadd($donations[$iid]['donation_amount'], $item['total_amount'], 6);
+                        } 
+                    }
+                }
+            }
 
             //
             // Get the inkind donations between the date range
@@ -252,19 +303,25 @@ function ciniki_sponsors_sponsors($ciniki) {
             //
             foreach($sponsors as $sid => $sponsor) {
                 $sponsors[$sid]['sponsorship_amount_display'] = '';
+                $sponsors[$sid]['donations_amount_display'] = '';
                 $sponsors[$sid]['inkind_value_display'] = '';
                 $sponsors[$sid]['inkind_amount_display'] = '';
-                if( isset($sponsorships[$sponsor['customer_id']]) ) {
+                if( $sponsor['customer_id'] > 0 && isset($sponsorships[$sponsor['customer_id']]) ) {
                     $sponsors[$sid]['sponsorship_amount'] = $sponsorships[$sponsor['customer_id']]['total_amount'];
                     $sponsors[$sid]['sponsorship_amount_display'] = '$' . number_format($sponsorships[$sponsor['customer_id']]['total_amount'], 0);
                     $totals['sponsorship_amount'] += $sponsorships[$sponsor['customer_id']]['total_amount'];
                 }
-                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['value'] > 0 ) {
+                if( $sponsor['customer_id'] > 0 && isset($donations[$sponsor['customer_id']]) ) {
+                    $sponsors[$sid]['donations_amount'] = $donations[$sponsor['customer_id']]['donation_amount'];
+                    $sponsors[$sid]['donations_amount_display'] = '$' . number_format($donations[$sponsor['customer_id']]['donation_amount'], 0);
+                    $totals['donations_amount'] += $donations[$sponsor['customer_id']]['donation_amount'];
+                }
+                if( $sponsor['customer_id'] > 0 && isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['value'] > 0 ) {
                     $sponsors[$sid]['inkind_value'] = $inkind[$sponsor['customer_id']]['value'];
                     $sponsors[$sid]['inkind_value_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['value'], 0);
                     $totals['inkind_value'] += $inkind[$sponsor['customer_id']]['value'];
                 }
-                if( isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['total_amount'] > 0 ) {
+                if( $sponsor['customer_id'] > 0 && isset($inkind[$sponsor['customer_id']]) && $inkind[$sponsor['customer_id']]['total_amount'] > 0 ) {
                     $sponsors[$sid]['inkind_amount'] = $inkind[$sponsor['customer_id']]['total_amount'];
                     $sponsors[$sid]['inkind_amount_display'] = '$' . number_format($inkind[$sponsor['customer_id']]['total_amount'], 0);
                     $totals['inkind_amount'] += $inkind[$sponsor['customer_id']]['total_amount'];

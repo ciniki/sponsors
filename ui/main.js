@@ -115,8 +115,9 @@ function ciniki_sponsors_main() {
             switch(j) {
                 case 0: return M.multiline(d.title, d.summary);
                 case 1: return d.sponsorship_amount_display;
-                case 2: return d.inkind_value_display;
-                case 3: return d.inkind_amount_display;
+                case 2: return d.donations_amount_display;
+                case 3: return d.inkind_value_display;
+                case 4: return d.inkind_amount_display;
             }
         }
     }
@@ -129,8 +130,9 @@ function ciniki_sponsors_main() {
             switch(i) {
                 case 0: return 'Totals';
                 case 1: return this.data.totals.sponsorship_amount_display;
-                case 2: return this.data.totals.inkind_value_display;
-                case 3: return this.data.totals.inkind_amount_display;
+                case 2: return this.data.totals.donations_amount_display;
+                case 3: return this.data.totals.inkind_value_display;
+                case 4: return this.data.totals.inkind_amount_display;
             }
             return '';
         }
@@ -203,7 +205,7 @@ function ciniki_sponsors_main() {
                 if( p.sections._tabs.selected == 'levels' ) {
                     p.sections.sponsors.num_cols = 1;
                 } else {
-                    p.sections.sponsors.num_cols = 4;
+                    p.sections.sponsors.num_cols = 5;
                 }
                 p.refresh();
                 p.show(cb);
@@ -459,6 +461,7 @@ function ciniki_sponsors_main() {
             'visible':function() {return M.modFlagSet('ciniki.sponsors', 0x04); },
             'tabs':{
                 'sponsorships':{'label':'Sponsorships', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("sponsorships");'},
+                'donations':{'label':'Donations', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("donations");'},
                 'items':{'label':'In Kind', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("items");'},
                 'website':{'label':'Website', 'fn':'M.ciniki_sponsors_main.sponsor.switchTab("website");'},
             }},
@@ -466,6 +469,11 @@ function ciniki_sponsors_main() {
             'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'sponsorships' ? 'yes' : 'hidden'; },
             'headerValues':['Date', 'Package', 'Attached to', 'Amount'],
             'noData':'No sponsorships',
+            },
+        'donations':{'label':'Donations', 'type':'simplegrid', 'num_cols':4,
+            'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'donations' ? 'yes' : 'hidden'; },
+            'headerValues':['Date', 'Amount'],
+            'noData':'No donations',
             },
         'donateditems':{'label':'Donated Items', 'type':'simplegrid', 'num_cols':5,
             'visible':function() { return M.ciniki_sponsors_main.sponsor.sections._tabs.selected == 'items' ? 'yes' : 'hidden'; },
@@ -599,6 +607,14 @@ function ciniki_sponsors_main() {
                 case 3: return M.formatDollar(d.total_amount);
             }
         }
+        if( s == 'donations' ) {
+            switch(j) {
+                case 0: return d.invoice_number;
+                case 1: return d.invoice_date;
+                case 2: return d.donation_amount;
+                case 3: return d.status_text;
+            }
+        }
         if( s == 'donateditems' ) {
             switch(j) {
                 case 0: return d.donated_date;
@@ -618,10 +634,10 @@ function ciniki_sponsors_main() {
     this.sponsor.switchTab = function(t) {
         this.sections._tabs.selected = t;
         this.refreshSections(['_tabs']);
-        this.showHideSections(['sponsorships', 'donateditems', '_image', '_excerpt']);
+        this.showHideSections(['sponsorships', 'donations', 'donateditems', '_image', '_excerpt']);
     }
     this.sponsor.downloadPDF = function() {
-        M.api.openFile('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id, 'output':'pdf', 'sponsorships':'yes', 'donateditems':'yes'});
+        M.api.openFile('ciniki.sponsors.sponsorGet', {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id, 'output':'pdf', 'sponsorships':'yes', 'donations':'yes', 'donateditems':'yes'});
     }
     this.sponsor.open = function(cb, sid, lid) {
         this.reset();
@@ -629,6 +645,7 @@ function ciniki_sponsors_main() {
         var args = {'tnid':M.curTenantID, 'sponsor_id':this.sponsor_id};
         if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
             args['sponsorships'] = 'yes';
+            args['donations'] = 'yes';
             args['donateditems'] = 'yes';
         }
         M.api.getJSONCb('ciniki.sponsors.sponsorGet', args, function(rsp) {
@@ -771,13 +788,13 @@ function ciniki_sponsors_main() {
         this.sponsors.category_id = 0;
         if( M.modFlagOn('ciniki.sponsors', 0x04) ) {
             this.sponsor.sections._tabs.selected = 'items';
-            this.sponsors.sections.sponsors.num_cols = 4;
-            this.sponsors.sections.sponsors.headerValues = ['Sponsor', 'Sponsorships', 'In Kind Value', 'Sold For'];
-            this.sponsors.sections.sponsors.headerClasses = ['', 'alignright', 'alignright', 'alignright'];
-            this.sponsors.sections.sponsors.cellClasses = ['multiline', 'alignright', 'alignright', 'alignright'];
-            this.sponsors.sections.sponsors.footerClasses = ['', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.num_cols = 5;
+            this.sponsors.sections.sponsors.headerValues = ['Sponsor', 'Sponsorships', 'Donations', 'In Kind Value', 'Sold For'];
+            this.sponsors.sections.sponsors.headerClasses = ['', 'alignright', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.cellClasses = ['multiline', 'alignright', 'alignright', 'alignright', 'alignright'];
+            this.sponsors.sections.sponsors.footerClasses = ['', 'alignright', 'alignright', 'alignright', 'alignright'];
             this.sponsors.sections.sponsors.sortable = 'yes';
-            this.sponsors.sections.sponsors.sortTypes = ['text', 'number', 'number', 'number'];
+            this.sponsors.sections.sponsors.sortTypes = ['text', 'number', 'number', 'number', 'number'];
         } else {
             this.sponsor.sections._tabs.selected = 'website';
             this.sponsors.sections.sponsors.num_cols = 1;

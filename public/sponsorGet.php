@@ -23,6 +23,7 @@ function ciniki_sponsors_sponsorGet($ciniki) {
         'tnid'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Tenant'), 
         'sponsor_id'=>array('required'=>'yes', 'blank'=>'no', 'name'=>'Sponsor'), 
         'sponsorships'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Sponsorships'), 
+        'donations'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Donations'), 
         'donateditems'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Donated Items'), 
         'output'=>array('required'=>'no', 'blank'=>'yes', 'name'=>'Output'), 
         )); 
@@ -216,6 +217,29 @@ function ciniki_sponsors_sponsorGet($ciniki) {
             }
         }
 
+        //
+        // Get the list of donations
+        //
+        if( isset($args['donations']) && $args['donations'] == 'yes' 
+            && ciniki_core_checkModuleActive($ciniki, 'ciniki.sapos') 
+            && $sponsor['customer_id'] > 0 
+            ) {
+            ciniki_core_loadMethod($ciniki, 'ciniki', 'sapos', 'hooks', 'uiCustomersData');
+            $rc = ciniki_sapos_hooks_uiCustomersData($ciniki, $args['tnid'], array(
+                'customer_id' => $sponsor['customer_id'],
+                ));
+            if( $rc['stat'] != 'ok' ) {
+                return array('stat'=>'fail', 'err'=>array('code'=>'ciniki.sponsors.73', 'msg'=>'Unable to load donations', 'err'=>$rc['err']));
+            }
+            $sponsor['donations'] = array();
+            if( isset($rc['tabs']) ) {
+                foreach($rc['tabs'] as $tab) {
+                    if( isset($tab['sections']['ciniki.sapos.donations']['data']) ) {
+                        $sponsor['donations'] = $tab['sections']['ciniki.sapos.donations']['data'];
+                    }
+                }
+            }
+        }
         //
         // Get the list of donated items
         //
