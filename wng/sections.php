@@ -76,8 +76,6 @@ function ciniki_sponsors_wng_sections(&$ciniki, $tnid, $args) {
             );
     }
 
-
-
     return array('stat'=>'ok', 'sections'=>$sections);
 }
 ?>

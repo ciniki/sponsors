@@ -665,7 +665,9 @@ function ciniki_sponsors_main() {
                 p.sections.customer_details.changeTxt = '';
             }
             if( (M.curTenant.modules['ciniki.sponsors'].flags&0x01) > 0 ) { 
-                p.sections.general.fields.level_id.options = {};
+                p.sections.general.fields.level_id.options = {
+                    0:'No Level',
+                    };
                 for(i in rsp.levels) {
                     p.sections.general.fields.level_id.options[rsp.levels[i].id] = rsp.levels[i].name;
                 }
