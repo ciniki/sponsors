@@ -760,6 +760,8 @@ function ciniki_sponsors_main() {
         // Check if levels or categories are enabled
         //
         if( M.modFlagAny('ciniki.sponsors', 0x05) == 'yes' ) {
+            // FIXME: CSS not working for full.mediumaside
+//            this.sponsors.size = 'full mediumaside';
             this.sponsors.size = 'full narrowaside';
             if( M.modFlagOn('ciniki.sponsors', 0x05) ) {
                 this.sponsors.sections.levels.label = 'Levels';
