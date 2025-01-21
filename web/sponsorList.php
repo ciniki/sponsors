@@ -29,7 +29,7 @@ function ciniki_sponsors_web_sponsorList($ciniki, $settings, $tnid) {
         . "WHERE ciniki_sponsors.tnid = '" . ciniki_core_dbQuote($ciniki, $tnid) . "' "
         // Check the participant is visible on the website
         . "AND (ciniki_sponsors.webflags&0x01) = 0 "
-        . "ORDER BY ciniki_sponsor_levels.sequence DESC, ciniki_sponsors.sequence DESC, title ";
+        . "ORDER BY ciniki_sponsor_levels.sequence DESC, ciniki_sponsors.sequence, title ";
     
     ciniki_core_loadMethod($ciniki, 'ciniki', 'core', 'private', 'dbHashQueryTree');
     $rc = ciniki_core_dbHashQueryTree($ciniki, $strsql, 'ciniki.sponsors', array(

@@ -43,7 +43,7 @@ function ciniki_sponsors_wng_sections(&$ciniki, $tnid, $args) {
     $levels = isset($rc['levels']) ? $rc['levels'] : array();
 
     //
-    // Display sponsors
+    // Display sponsors/donors
     //
     if( ciniki_core_checkModuleFlags($ciniki, 'ciniki.sponsors', 0x01) && count($levels) > 0 ) {
         $sections['ciniki.sponsors.level'] = array(
@@ -56,7 +56,11 @@ function ciniki_sponsors_wng_sections(&$ciniki, $tnid, $args) {
                     'options' => $levels,
                     ),
                 'layout' => array('label' => 'Layout', 'type' => 'toggle', 'default'=>'imagebuttons',
-                    'toggles' => array('imagebuttons' => 'Image Buttons', 'flexcards' => 'Flex Cards'),
+                    'toggles' => array(
+                        'imagebuttons' => 'Image Buttons', 
+                        'flexcards' => 'Flex Cards',
+                        'textcolumns' => 'Text Columns',
+                        ),
                     ),
                 ),
             );
