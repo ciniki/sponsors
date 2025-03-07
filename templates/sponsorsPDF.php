@@ -125,12 +125,14 @@ function ciniki_sponsors_templates_sponsorsPDF(&$ciniki, $tnid, $args) {
         $pdf->SetFont('', '', 10);
         $pdf->SetCellPadding(2);
         $w = array(40, 140);
-        foreach($sponsor['customer_details'] as $detail ) {
-            $pdf->SetFont('', 'B', 10);
-            $lh = $pdf->getStringHeight($w[1], $detail['value']);
-            $pdf->MultiCell($w[0], $lh, $detail['label'], 1, 'R', 1, 0);
-            $pdf->SetFont('', '', 10);
-            $pdf->MultiCell($w[1], $lh, $detail['value'], 1, 'L', 0, 1);
+        if( isset($sponsor['customer_details']) ) {
+            foreach($sponsor['customer_details'] as $detail ) {
+                $pdf->SetFont('', 'B', 10);
+                $lh = $pdf->getStringHeight($w[1], $detail['value']);
+                $pdf->MultiCell($w[0], $lh, $detail['label'], 1, 'R', 1, 0);
+                $pdf->SetFont('', '', 10);
+                $pdf->MultiCell($w[1], $lh, $detail['value'], 1, 'L', 0, 1);
+            }
         }
 
         //
@@ -170,7 +172,7 @@ function ciniki_sponsors_templates_sponsorsPDF(&$ciniki, $tnid, $args) {
                 if( $lh < $pdf->getStringHeight($w[1], $item['name']) ) {
                     $lh = $pdf->getStringHeight($w[1], $item['name']);
                 }
-                if( $lh < $pdf->getStringHeight($w[2], $item['attached_to']) ) {
+                if( isset($item['attached_to']) && $lh < $pdf->getStringHeight($w[2], $item['attached_to']) ) {
                     $lh = $pdf->getStringHeight($w[2], $item['attached_to']);
                 }
                 if( $lh < $pdf->getStringHeight($w[3], $item['total_amount_display']) ) {
@@ -178,7 +180,11 @@ function ciniki_sponsors_templates_sponsorsPDF(&$ciniki, $tnid, $args) {
                 }
                 $pdf->MultiCell($w[0], $lh, $item['invoice_date'], 1, 'L', 0, 0);
                 $pdf->MultiCell($w[1], $lh, $item['name'], 1, 'L', 0, 0);
-                $pdf->MultiCell($w[2], $lh, $item['attached_to'], 1, 'L', 0, 0);
+                if( isset($item['attached_to']) ) {
+                    $pdf->MultiCell($w[2], $lh, $item['attached_to'], 1, 'L', 0, 0);
+                } else {
+                    $pdf->MultiCell($w[2], $lh, '', 1, 'L', 0, 0);
+                }
                 $pdf->MultiCell($w[3], $lh, $item['total_amount_display'], 1, 'L', 0, 1);
             }
         }
@@ -203,24 +209,24 @@ function ciniki_sponsors_templates_sponsorsPDF(&$ciniki, $tnid, $args) {
             $pdf->MultiCell($w[4], $lh, 'Date', 1, 'L', 1, 1);
             $pdf->SetFont('', '', 10);
             foreach($sponsor['donateditems'] as $item) {    
-                $lh = $pdf->getStringHeight($w[0], $item['value']);
-                if( $lh < $pdf->getStringHeight($w[1], $item['value_display']) ) {
-                    $lh = $pdf->getStringHeight($w[1], $item['value_display']);
+                $lh = $pdf->getStringHeight($w[0], $item['name']);
+                if( $lh < $pdf->getStringHeight($w[1], $item['value_amount']) ) {
+                    $lh = $pdf->getStringHeight($w[1], $item['value_amount']);
                 }
-                if( $lh < $pdf->getStringHeight($w[2], $item['exhibit_name']) ) {
-                    $lh = $pdf->getStringHeight($w[2], $item['exhibit_name']);
+                if( $lh < $pdf->getStringHeight($w[2], $item['event_name']) ) {
+                    $lh = $pdf->getStringHeight($w[2], $item['event_name']);
                 }
-                if( $lh < $pdf->getStringHeight($w[3], $item['total_amount_display']) ) {
-                    $lh = $pdf->getStringHeight($w[3], $item['total_amount_display']);
+                if( $lh < $pdf->getStringHeight($w[3], $item['sold_amount']) ) {
+                    $lh = $pdf->getStringHeight($w[3], $item['sold_amount']);
                 }
-                if( $lh < $pdf->getStringHeight($w[4], $item['sell_date_display']) ) {
-                    $lh = $pdf->getStringHeight($w[4], $item['sell_date_display']);
+                if( $lh < $pdf->getStringHeight($w[4], $item['sold_date']) ) {
+                    $lh = $pdf->getStringHeight($w[4], $item['sold_date']);
                 }
                 $pdf->MultiCell($w[0], $lh, $item['name'], 1, 'L', 0, 0);
-                $pdf->MultiCell($w[1], $lh, $item['value_display'], 1, 'L', 0, 0);
-                $pdf->MultiCell($w[2], $lh, $item['exhibit_name'], 1, 'L', 0, 0);
-                $pdf->MultiCell($w[3], $lh, $item['total_amount_display'], 1, 'L', 0, 0);
-                $pdf->MultiCell($w[4], $lh, $item['sell_date_display'], 1, 'L', 0, 1);
+                $pdf->MultiCell($w[1], $lh, $item['value_amount'], 1, 'L', 0, 0);
+                $pdf->MultiCell($w[2], $lh, $item['event_name'], 1, 'L', 0, 0);
+                $pdf->MultiCell($w[3], $lh, $item['sold_amount'], 1, 'L', 0, 0);
+                $pdf->MultiCell($w[4], $lh, $item['sold_date'], 1, 'L', 0, 1);
             }
         }
 
