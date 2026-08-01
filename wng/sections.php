@@ -59,9 +59,22 @@ function ciniki_sponsors_wng_sections(&$ciniki, $tnid, $args) {
                     'toggles' => array(
                         'imagebuttons' => 'Image Buttons', 
                         'flexcards' => 'Flex Cards',
+                        'tradingcards' => 'Trading Cards',
                         'textcolumns' => 'Text Columns',
                         ),
                     ),
+                'image-ratio' => array('label' => 'Image Ratio', 
+                    'type'=>'select', 
+                    'default'=>'4-3', 
+                    'options'=>array(
+                        '2-1' => 'Panoramic',
+                        '16-9' => 'Letterbox',
+                        '6-4' => 'Wider',
+                        '4-3' => 'Wide',
+                        '1-1' => 'Square',
+                        '3-4' => 'Tall',
+                        '4-6' => 'Taller',
+                    )),
                 ),
             );
     }
