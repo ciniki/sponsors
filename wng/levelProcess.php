@@ -74,7 +74,7 @@ function ciniki_sponsors_wng_levelProcess($ciniki, $tnid, &$request, $section) {
         } elseif( isset($s['layout']) && $s['layout'] == 'tradingcards' ) {
             $blocks[] = array(
                 'type' => 'tradingcards',
-                'class' => 'sponsors-level sponsors-level-' . $levelclass,
+                'class' => 'aligncenter sponsors-level sponsors-level-' . $levelclass,
                 'image-format' => 'padded',
                 'image-ratio' => isset($s['image-ratio']) ? $s['image-ratio'] : '4-3',
                 'items' => $sponsors,
